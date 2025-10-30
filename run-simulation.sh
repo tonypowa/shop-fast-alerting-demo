@@ -101,7 +101,19 @@ while true; do
                 ;;
             2)
                 echo ""
-                read -p "Product ID [1=Gaming Laptop]: " product_id
+                echo "Available Products:"
+                echo "  1. Gaming Laptop (Stock: 50)"
+                echo "  2. Wireless Mouse (Stock: 150)"
+                echo "  3. Mechanical Keyboard (Stock: 75)"
+                echo "  4. USB-C Hub (Stock: 200)"
+                echo "  5. External SSD 1TB (Stock: 30)"
+                echo "  6. Webcam 4K (Stock: 25)"
+                echo "  7. Noise-Canceling Headphones (Stock: 40)"
+                echo "  8. Monitor 27\" (Stock: 20)"
+                echo "  9. Laptop Stand (Stock: 100)"
+                echo " 10. Phone Charger (Stock: 300)"
+                echo ""
+                read -p "Select Product ID [1-10, default: 1]: " product_id
                 product_id=${product_id:-1}
                 read -p "Duration in seconds [30]: " duration
                 duration=${duration:-30}
@@ -143,7 +155,19 @@ while true; do
                 ;;
             6)
                 echo ""
-                read -p "Product ID [6]: " product_id
+                echo "Available Products:"
+                echo "  1. Gaming Laptop (Stock: 50)"
+                echo "  2. Wireless Mouse (Stock: 150)"
+                echo "  3. Mechanical Keyboard (Stock: 75)"
+                echo "  4. USB-C Hub (Stock: 200)"
+                echo "  5. External SSD 1TB (Stock: 30)"
+                echo "  6. Webcam 4K (Stock: 25)"
+                echo "  7. Noise-Canceling Headphones (Stock: 40)"
+                echo "  8. Monitor 27\" (Stock: 20)"
+                echo "  9. Laptop Stand (Stock: 100)"
+                echo " 10. Phone Charger (Stock: 300)"
+                echo ""
+                read -p "Select Product ID [1-10, default: 6]: " product_id
                 product_id=${product_id:-6}
                 run_simulation "low-inventory" --product-id "$product_id"
                 break

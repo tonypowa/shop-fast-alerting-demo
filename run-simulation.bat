@@ -73,7 +73,19 @@ goto post_simulation
 
 :flash_sale
 echo.
-set /p product_id="Product ID [1=Gaming Laptop]: "
+echo Available Products:
+echo   1. Gaming Laptop (Stock: 50)
+echo   2. Wireless Mouse (Stock: 150)
+echo   3. Mechanical Keyboard (Stock: 75)
+echo   4. USB-C Hub (Stock: 200)
+echo   5. External SSD 1TB (Stock: 30)
+echo   6. Webcam 4K (Stock: 25)
+echo   7. Noise-Canceling Headphones (Stock: 40)
+echo   8. Monitor 27" (Stock: 20)
+echo   9. Laptop Stand (Stock: 100)
+echo  10. Phone Charger (Stock: 300)
+echo.
+set /p product_id="Select Product ID [1-10, default: 1]: "
 if "%product_id%"=="" set product_id=1
 set /p duration="Duration in seconds [30]: "
 if "%duration%"=="" set duration=30
@@ -113,7 +125,19 @@ goto post_simulation
 
 :low_inventory
 echo.
-set /p product_id="Product ID [6]: "
+echo Available Products:
+echo   1. Gaming Laptop (Stock: 50)
+echo   2. Wireless Mouse (Stock: 150)
+echo   3. Mechanical Keyboard (Stock: 75)
+echo   4. USB-C Hub (Stock: 200)
+echo   5. External SSD 1TB (Stock: 30)
+echo   6. Webcam 4K (Stock: 25)
+echo   7. Noise-Canceling Headphones (Stock: 40)
+echo   8. Monitor 27" (Stock: 20)
+echo   9. Laptop Stand (Stock: 100)
+echo  10. Phone Charger (Stock: 300)
+echo.
+set /p product_id="Select Product ID [1-10, default: 6]: "
 if "%product_id%"=="" set product_id=6
 call :run_simulation low-inventory --product-id %product_id%
 goto post_simulation
