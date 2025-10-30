@@ -1,0 +1,171 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: shopfast-postgres
+    environment:
+      POSTGRES_DB: shopfast
+      POSTGRES_USER: shopfast
+      POSTGRES_PASSWORD: shopfast123
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - monitoring
+
+  # Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: shopfast-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - monitoring
+
+  # Loki
+  loki:
+    image: grafana/loki:latest
+    container_name: shopfast-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/local-config.yaml
+      - loki-data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - monitoring
+
+  # Promtail (log collector for Loki)
+  promtail:
+    image: grafana/promtail:latest
+    container_name: shopfast-promtail
+    volumes:
+      - ./loki/promtail-config.yml:/etc/promtail/config.yml
+      - /var/log:/var/log
+      - ./logs:/app/logs
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - monitoring
+    depends_on:
+      - loki
+
+  # Grafana
+  grafana:
+    image: grafana/grafana:12.0.0
+    container_name: shopfast-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - grafana-data:/var/lib/grafana
+    networks:
+      - monitoring
+    depends_on:
+      - prometheus
+      - loki
+      - postgres
+
+  # API Service
+  api-service:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+    container_name: shopfast-api
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=shopfast
+      - DB_PASSWORD=shopfast123
+      - DB_NAME=shopfast
+      - LOG_FILE=/app/logs/api.log
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - monitoring
+    depends_on:
+      - postgres
+
+  # Frontend Service
+  frontend-service:
+    build:
+      context: ./services/frontend
+      dockerfile: Dockerfile
+    container_name: shopfast-frontend
+    ports:
+      - "8081:8081"
+    environment:
+      - API_URL=http://api-service:8080
+      - LOG_FILE=/app/logs/frontend.log
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - monitoring
+    depends_on:
+      - api-service
+
+  # Payment Service
+  payment-service:
+    build:
+      context: ./services/payment
+      dockerfile: Dockerfile
+    container_name: shopfast-payment
+    ports:
+      - "8082:8082"
+    environment:
+      - LOG_FILE=/app/logs/payment.log
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - monitoring
+
+  # Inventory Service
+  inventory-service:
+    build:
+      context: ./services/inventory
+      dockerfile: Dockerfile
+    container_name: shopfast-inventory
+    ports:
+      - "8083:8083"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=shopfast
+      - DB_PASSWORD=shopfast123
+      - DB_NAME=shopfast
+      - LOG_FILE=/app/logs/inventory.log
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - monitoring
+    depends_on:
+      - postgres
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  prometheus-data:
+  loki-data:
+  grafana-data:
+

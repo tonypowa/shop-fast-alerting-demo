@@ -1,0 +1,42 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # API Service metrics
+  - job_name: 'api-service'
+    static_configs:
+      - targets: ['api-service:8080']
+        labels:
+          service: 'api'
+          environment: 'demo'
+
+  # Frontend Service metrics
+  - job_name: 'frontend-service'
+    static_configs:
+      - targets: ['frontend-service:8081']
+        labels:
+          service: 'frontend'
+          environment: 'demo'
+
+  # Payment Service metrics
+  - job_name: 'payment-service'
+    static_configs:
+      - targets: ['payment-service:8082']
+        labels:
+          service: 'payment'
+          environment: 'demo'
+
+  # Inventory Service metrics
+  - job_name: 'inventory-service'
+    static_configs:
+      - targets: ['inventory-service:8083']
+        labels:
+          service: 'inventory'
+          environment: 'demo'
+
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+

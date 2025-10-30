@@ -1,0 +1,29 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # Scrape logs from all services
+  - job_name: shopfast-services
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: shopfast-services
+          __path__: /app/logs/*.log
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<timestamp>\S+)\s+(?P<level>\S+)\s+\[(?P<service>\S+)\]\s+(?P<message>.+)$'
+      - labels:
+          level:
+          service:
+      - timestamp:
+          source: timestamp
+          format: RFC3339
+

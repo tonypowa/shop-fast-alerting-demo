@@ -1,0 +1,40 @@
+apiVersion: 1
+
+datasources:
+  # Prometheus
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: 15s
+
+  # Loki
+  - name: Loki
+    type: loki
+    uid: loki
+    access: proxy
+    url: http://loki:3100
+    editable: true
+    jsonData:
+      maxLines: 1000
+
+  # PostgreSQL
+  - name: PostgreSQL
+    type: postgres
+    uid: postgres
+    access: proxy
+    url: postgres:5432
+    database: shopfast
+    user: shopfast
+    editable: true
+    jsonData:
+      sslmode: disable
+      postgresVersion: 1500
+      timescaledb: false
+    secureJsonData:
+      password: shopfast123
+

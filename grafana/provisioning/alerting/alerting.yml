@@ -1,0 +1,184 @@
+apiVersion: 1
+
+policies:
+  - orgId: 1
+    receiver: grafana-default-email
+    group_by: ['alertname']
+
+groups:
+  - orgId: 1
+    name: ShopFast Alerts
+    folder: ShopFast Demo
+    interval: 30s
+    rules:
+      # High CPU Usage Alert
+      - uid: high_cpu_alert
+        title: High CPU Usage
+        condition: A
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: 'rate(process_cpu_seconds_total[1m]) > 0.7'
+              refId: A
+        noDataState: NoData
+        execErrState: Error
+        for: 1m
+        annotations:
+          description: 'CPU usage is above 70% for {{ $labels.service }} service'
+          summary: 'High CPU usage detected'
+        labels:
+          severity: warning
+          team: platform
+
+      # High Error Rate Alert
+      - uid: high_error_rate
+        title: High Error Rate
+        condition: A
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: 'rate(http_requests_total{status=~"5.."}[5m]) > 0.1'
+              refId: A
+        noDataState: NoData
+        execErrState: Error
+        for: 2m
+        annotations:
+          description: 'Error rate is above 10% for {{ $labels.service }} service'
+          summary: 'High error rate detected'
+        labels:
+          severity: critical
+          team: backend
+
+      # Slow Response Time Alert
+      - uid: slow_response_time
+        title: Slow API Response Time
+        condition: A
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: prometheus
+            model:
+              expr: 'histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1.0'
+              refId: A
+        noDataState: NoData
+        execErrState: Error
+        for: 3m
+        annotations:
+          description: '95th percentile response time is above 1 second for {{ $labels.service }}'
+          summary: 'Slow response time detected'
+        labels:
+          severity: warning
+          team: backend
+
+      # Payment Service Failures
+      - uid: payment_failures
+        title: Payment Service Failures
+        condition: A
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: loki
+            model:
+              expr: 'sum(count_over_time({service="payment"} |~ "ERROR|payment failed" [5m])) > 5'
+              refId: A
+        noDataState: NoData
+        execErrState: Error
+        for: 1m
+        annotations:
+          description: 'Payment service has more than 5 failures in the last 5 minutes'
+          summary: 'Payment service experiencing failures'
+        labels:
+          severity: critical
+          team: payments
+
+      # Low Inventory Alert
+      - uid: low_inventory
+        title: Low Inventory Warning
+        condition: A
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: postgres
+            model:
+              rawSql: "SELECT name as metric, stock_level as value FROM products WHERE stock_level <= low_stock_threshold"
+              format: table
+              refId: A
+        noDataState: NoData
+        execErrState: Error
+        for: 30s
+        annotations:
+          description: 'Products are running low on inventory'
+          summary: 'Low inventory detected for multiple products'
+        labels:
+          severity: warning
+          team: operations
+
+      # Critical Inventory Alert
+      - uid: critical_inventory
+        title: Critical Inventory Alert
+        condition: A
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: postgres
+            model:
+              rawSql: "SELECT name as metric, stock_level as value FROM products WHERE stock_level <= 5"
+              format: table
+              refId: A
+        noDataState: NoData
+        execErrState: Error
+        for: 30s
+        annotations:
+          description: 'Products have critically low inventory (5 or fewer units)'
+          summary: 'CRITICAL: Inventory almost depleted'
+        labels:
+          severity: critical
+          team: operations
+
+      # Failed Login Attempts (Security)
+      - uid: failed_login_attempts
+        title: Multiple Failed Login Attempts
+        condition: A
+        data:
+          - refId: A
+            queryType: ''
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: postgres
+            model:
+              rawSql: "SELECT email as metric, COUNT(*) as value FROM login_attempts WHERE success = false AND attempt_time > NOW() - INTERVAL '5 minutes' GROUP BY email HAVING COUNT(*) >= 5"
+              format: table
+              refId: A
+        noDataState: NoData
+        execErrState: Error
+        for: 1m
+        annotations:
+          description: 'Multiple failed login attempts detected for user account'
+          summary: 'Potential brute force attack detected'
+        labels:
+          severity: critical
+          team: security
+
