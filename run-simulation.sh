@@ -74,8 +74,10 @@ echo "╚═══════════════════════�
 echo ""
 echo "Choose a simulation scenario to trigger Grafana alerts:"
 echo ""
+echo "💡 TIP: Press 'q' or '9' to exit at any time"
+echo ""
 
-PS3="Select scenario (1-9): "
+PS3="Select scenario (1-9, or 'q' to quit): "
 options=(
     "🟢 Normal Traffic (baseline - no alerts)"
     "⚡ Flash Sale (triggers LOW INVENTORY alert)"
@@ -92,6 +94,11 @@ while true; do
     select opt in "${options[@]}"
     do
         case $REPLY in
+            q|Q)
+                echo ""
+                echo "👋 Goodbye!"
+                exit 0
+                ;;
             1)
                 echo ""
                 read -p "Duration in seconds [60]: " duration
@@ -207,13 +214,20 @@ while true; do
     done
     
     echo ""
-    read -p "Press Enter to continue..."
+    read -p "Press Enter to continue (or 'q' to quit)... " continue_choice
+    if [[ $continue_choice =~ ^[Qq]$ ]]; then
+        echo ""
+        echo "👋 Goodbye!"
+        exit 0
+    fi
     clear
     echo "╔════════════════════════════════════════════════════════════╗"
     echo "║        🚀 ShopFast Simulation Control Center 🚀           ║"
     echo "╚════════════════════════════════════════════════════════════╝"
     echo ""
     echo "Choose a simulation scenario to trigger Grafana alerts:"
+    echo ""
+    echo "💡 TIP: Press 'q' or '9' to exit at any time"
     echo ""
 done
 

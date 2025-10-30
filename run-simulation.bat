@@ -39,6 +39,8 @@ echo ╚════════════════════════
 echo.
 echo Choose a simulation scenario to trigger Grafana alerts:
 echo.
+echo 💡 TIP: Press 'q' or '9' to exit at any time
+echo.
 echo 1. 🟢 Normal Traffic (baseline - no alerts)
 echo 2. ⚡ Flash Sale (triggers LOW INVENTORY alert)
 echo 3. 💳 Payment Failures (triggers LOG-BASED alert)
@@ -49,8 +51,9 @@ echo 7. 🎯 Run ALL Scenarios (complete demo)
 echo 8. 🔧 Rebuild Docker Image
 echo 9. ❌ Exit
 echo.
-set /p choice="Select scenario (1-9): "
+set /p choice="Select scenario (1-9, or 'q' to quit): "
 
+if /i "%choice%"=="q" goto exit
 if "%choice%"=="1" goto normal_traffic
 if "%choice%"=="2" goto flash_sale
 if "%choice%"=="3" goto payment_failures
@@ -167,7 +170,12 @@ goto menu
 
 :post_simulation
 echo.
-pause
+set /p continue_choice="Press Enter to continue (or 'q' to quit)... "
+if /i "%continue_choice%"=="q" (
+    echo.
+    echo 👋 Goodbye!
+    exit /b 0
+)
 goto menu
 
 :exit
