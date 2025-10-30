@@ -21,8 +21,24 @@ echo "╔═══════════════════════�
 echo "║         📊 ShopFast Database Control Panel 📊            ║"
 echo "╚════════════════════════════════════════════════════════════╝"
 echo ""
-echo "Current Gaming Laptop Stock:"
-$DB_EXEC "SELECT id, name, stock_level, low_stock_threshold FROM products WHERE id = 1;" 2>/dev/null
+echo "Current Stock Levels (Sorted by Stock):"
+$DB_EXEC "
+    SELECT 
+        id,
+        CASE 
+            WHEN LENGTH(name) > 28 THEN SUBSTRING(name, 1, 25) || '...'
+            ELSE name
+        END as name,
+        stock_level,
+        low_stock_threshold,
+        CASE 
+            WHEN stock_level <= 5 THEN '🔴 CRITICAL'
+            WHEN stock_level <= low_stock_threshold THEN '🟡 LOW'
+            ELSE '🟢 OK'
+        END as status
+    FROM products 
+    ORDER BY stock_level ASC;
+" 2>/dev/null
 echo ""
 echo "💡 TIP: Press 'q' or '8' to exit at any time"
 echo ""
@@ -108,8 +124,24 @@ while true; do
     echo "║         📊 ShopFast Database Control Panel 📊            ║"
     echo "╚════════════════════════════════════════════════════════════╝"
     echo ""
-    echo "Current Gaming Laptop Stock:"
-    $DB_EXEC "SELECT id, name, stock_level, low_stock_threshold FROM products WHERE id = 1;" 2>/dev/null
+    echo "Current Stock Levels (Sorted by Stock):"
+    $DB_EXEC "
+        SELECT 
+            id,
+            CASE 
+                WHEN LENGTH(name) > 28 THEN SUBSTRING(name, 1, 25) || '...'
+                ELSE name
+            END as name,
+            stock_level,
+            low_stock_threshold,
+            CASE 
+                WHEN stock_level <= 5 THEN '🔴 CRITICAL'
+                WHEN stock_level <= low_stock_threshold THEN '🟡 LOW'
+                ELSE '🟢 OK'
+            END as status
+        FROM products 
+        ORDER BY stock_level ASC;
+    " 2>/dev/null
     echo ""
     echo "💡 TIP: Press 'q' or '8' to exit at any time"
     echo ""
