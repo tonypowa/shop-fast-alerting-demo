@@ -74,11 +74,12 @@ echo "╚═══════════════════════�
 echo ""
 echo "Choose a simulation scenario to trigger Grafana alerts:"
 echo ""
-echo "💡 TIP: Press 'q' or '9' to exit at any time"
+echo "💡 TIP: Press 'q' or '10' to exit | Option '1' to view stock levels"
 echo ""
 
-PS3="Select scenario (1-9, or 'q' to quit): "
+PS3="Select scenario (1-10, or 'q' to quit): "
 options=(
+    "📊 View Current Stock Levels"
     "🟢 Normal Traffic (baseline - no alerts)"
     "⚡ Flash Sale (triggers LOW INVENTORY alert)"
     "💳 Payment Failures (triggers LOG-BASED alert)"
@@ -101,12 +102,35 @@ while true; do
                 ;;
             1)
                 echo ""
+                echo "📊 Current Stock Levels"
+                echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                echo ""
+                docker exec shopfast-postgres psql -U shopfast -d shopfast -c "
+                    SELECT 
+                        id,
+                        name,
+                        stock_level,
+                        low_stock_threshold,
+                        CASE 
+                            WHEN stock_level <= 5 THEN '🔴 CRITICAL'
+                            WHEN stock_level <= low_stock_threshold THEN '🟡 LOW'
+                            ELSE '🟢 OK'
+                        END as status
+                    FROM products 
+                    ORDER BY id;
+                " 2>/dev/null || echo "❌ Could not connect to database. Is Docker running?"
+                echo ""
+                echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                break
+                ;;
+            2)
+                echo ""
                 read -p "Duration in seconds [60]: " duration
                 duration=${duration:-60}
                 run_simulation "normal" --duration "$duration"
                 break
                 ;;
-            2)
+            3)
                 echo ""
                 echo "Available Products:"
                 echo "  1. Gaming Laptop (Stock: 50)"
@@ -130,7 +154,7 @@ while true; do
                 echo "   Look for 'Low Inventory Warning' alert"
                 break
                 ;;
-            3)
+            4)
                 echo ""
                 read -p "Duration in seconds [60]: " duration
                 duration=${duration:-60}
@@ -140,7 +164,7 @@ while true; do
                 echo "   Query: {service=\"payment\"} |= \"ERROR\""
                 break
                 ;;
-            4)
+            5)
                 echo ""
                 read -p "Number of failed login attempts [10]: " attempts
                 attempts=${attempts:-10}
@@ -150,7 +174,7 @@ while true; do
                 echo "   Look for 'Multiple Failed Login Attempts' alert"
                 break
                 ;;
-            5)
+            6)
                 echo ""
                 read -p "Duration in seconds [30]: " duration
                 duration=${duration:-30}
@@ -160,7 +184,7 @@ while true; do
                 echo "   Look for 'High CPU Usage' alert"
                 break
                 ;;
-            6)
+            7)
                 echo ""
                 echo "Available Products:"
                 echo "  1. Gaming Laptop (Stock: 50)"
@@ -179,7 +203,7 @@ while true; do
                 run_simulation "low-inventory" --product-id "$product_id"
                 break
                 ;;
-            7)
+            8)
                 echo ""
                 echo "⏱️  This will run all scenarios in sequence (~5 minutes)"
                 read -p "Continue? (y/N): " confirm
@@ -192,7 +216,7 @@ while true; do
                 fi
                 break
                 ;;
-            8)
+            9)
                 echo ""
                 echo "🔨 Rebuilding Docker image..."
                 docker rmi $IMAGE_NAME 2>/dev/null || true
@@ -201,13 +225,13 @@ while true; do
                 echo ""
                 break
                 ;;
-            9)
+            10)
                 echo ""
                 echo "👋 Goodbye!"
                 exit 0
                 ;;
             *)
-                echo "❌ Invalid option. Please select 1-9."
+                echo "❌ Invalid option. Please select 1-10 or 'q'."
                 break
                 ;;
         esac
@@ -227,7 +251,7 @@ while true; do
     echo ""
     echo "Choose a simulation scenario to trigger Grafana alerts:"
     echo ""
-    echo "💡 TIP: Press 'q' or '9' to exit at any time"
+    echo "💡 TIP: Press 'q' or '10' to exit | Option '1' to view stock levels"
     echo ""
 done
 

@@ -39,21 +39,23 @@ echo ╚════════════════════════
 echo.
 echo Choose a simulation scenario to trigger Grafana alerts:
 echo.
-echo 💡 TIP: Press 'q' or '9' to exit at any time
+echo 💡 TIP: Press 'q' or '9' to exit ^| Option '0' to view stock levels
 echo.
-echo 1. 🟢 Normal Traffic (baseline - no alerts)
-echo 2. ⚡ Flash Sale (triggers LOW INVENTORY alert)
-echo 3. 💳 Payment Failures (triggers LOG-BASED alert)
-echo 4. 🔒 Security Breach (triggers DATABASE alert)
-echo 5. 🔥 High CPU Usage (triggers METRICS alert)
-echo 6. 📦 Low Inventory (gradual depletion)
-echo 7. 🎯 Run ALL Scenarios (complete demo)
-echo 8. 🔧 Rebuild Docker Image
-echo 9. ❌ Exit
+echo  0. 📊 View Current Stock Levels
+echo  1. 🟢 Normal Traffic (baseline - no alerts)
+echo  2. ⚡ Flash Sale (triggers LOW INVENTORY alert)
+echo  3. 💳 Payment Failures (triggers LOG-BASED alert)
+echo  4. 🔒 Security Breach (triggers DATABASE alert)
+echo  5. 🔥 High CPU Usage (triggers METRICS alert)
+echo  6. 📦 Low Inventory (gradual depletion)
+echo  7. 🎯 Run ALL Scenarios (complete demo)
+echo  8. 🔧 Rebuild Docker Image  
+echo  9. ❌ Exit
 echo.
-set /p choice="Select scenario (1-9, or 'q' to quit): "
+set /p choice="Select scenario (0-9, or 'q' to quit): "
 
 if /i "%choice%"=="q" goto exit
+if "%choice%"=="0" goto view_stock
 if "%choice%"=="1" goto normal_traffic
 if "%choice%"=="2" goto flash_sale
 if "%choice%"=="3" goto payment_failures
@@ -63,9 +65,19 @@ if "%choice%"=="6" goto low_inventory
 if "%choice%"=="7" goto run_all
 if "%choice%"=="8" goto rebuild_image
 if "%choice%"=="9" goto exit
-echo Invalid option. Please select 1-9.
+echo Invalid option. Please select 0-9 or 'q'.
 pause
 goto menu
+
+:view_stock
+echo.
+echo 📊 Current Stock Levels
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo.
+docker exec shopfast-postgres psql -U shopfast -d shopfast -c "SELECT id, name, stock_level, low_stock_threshold, CASE WHEN stock_level <= 5 THEN '🔴 CRITICAL' WHEN stock_level <= low_stock_threshold THEN '🟡 LOW' ELSE '🟢 OK' END as status FROM products ORDER BY id;" 2>nul || echo ❌ Could not connect to database. Is Docker running?
+echo.
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+goto post_simulation
 
 :normal_traffic
 echo.
