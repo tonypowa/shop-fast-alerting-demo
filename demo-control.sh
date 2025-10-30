@@ -1,6 +1,19 @@
 #!/bin/bash
 # Demo Control Script - Easy inventory management during presentation
 
+# Check for Docker permissions
+if ! docker ps &>/dev/null; then
+    echo "❌ Docker permission denied!"
+    echo ""
+    echo "Options:"
+    echo "  1. Run with sudo: sudo ./demo-control.sh"
+    echo "  2. Add your user to docker group:"
+    echo "     sudo usermod -aG docker $USER"
+    echo "     newgrp docker  # or logout/login"
+    echo ""
+    exit 1
+fi
+
 DB_EXEC="docker exec shopfast-postgres psql -U shopfast -d shopfast -c"
 
 echo "=== ShopFast Demo Control ==="
