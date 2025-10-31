@@ -267,7 +267,7 @@ while true; do
                 ;;
             5)
                 echo ""
-                $DB_EXEC "SELECT id, name, stock_level, low_stock_threshold FROM products ORDER BY stock_level;" 2>/dev/null
+                $DB_EXEC "SELECT id, name, stock_level, low_stock_threshold FROM products ORDER BY id;" 2>/dev/null
                 break
                 ;;
             6)
