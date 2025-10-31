@@ -1,0 +1,50 @@
+// Grafana Alloy Configuration for ShopFast Demo
+// This replaces Promtail with the modern unified observability collector
+
+// Discover log files in the shared logs directory
+local.file_match "shopfast_logs" {
+  path_targets = [{
+    __address__ = "localhost",
+    __path__    = "/app/logs/*.log",
+    job         = "shopfast-services",
+  }]
+}
+
+// Tail the discovered log files
+loki.source.file "shopfast_services" {
+  targets    = local.file_match.shopfast_logs.targets
+  forward_to = [loki.process.parse_logs.receiver]
+}
+
+// Parse log lines and extract labels
+loki.process "parse_logs" {
+  // Extract timestamp, level, service, and message from log lines
+  // Expected format: "2024-10-31T12:34:56Z INFO [api-service] Some message"
+  stage.regex {
+    expression = "^(?P<timestamp>\\S+)\\s+(?P<level>\\S+)\\s+\\[(?P<service>\\S+)\\]\\s+(?P<message>.+)$"
+  }
+
+  // Add extracted fields as labels
+  stage.labels {
+    values = {
+      level   = "",
+      service = "",
+    }
+  }
+
+  // Parse timestamp
+  stage.timestamp {
+    source = "timestamp"
+    format = "RFC3339"
+  }
+
+  forward_to = [loki.write.loki_endpoint.receiver]
+}
+
+// Write logs to Loki
+loki.write "loki_endpoint" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+

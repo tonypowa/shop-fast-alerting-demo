@@ -76,8 +76,10 @@ docker compose up -d
 **Observability Stack:**
 - Grafana 12 - Dashboards and alerting
 - Prometheus - Metrics collection
-- Loki + Promtail - Log aggregation
+- Loki + Alloy - Log aggregation (modern unified collector)
 - PostgreSQL - Business database
+
+> 🚀 **Why Alloy?** This demo uses Grafana Alloy, the modern replacement for Promtail. Alloy is Grafana's unified observability collector with better performance, cleaner configuration syntax (River), and support for logs, metrics, and traces in one agent.
 
 **Microservices:**
 - API Service (8080) - Product catalog and orders
@@ -102,7 +104,7 @@ docker compose up -d
 
 - Docker Desktop or Docker Engine + Docker Compose
 - 4GB RAM available
-- Ports: 3000, 8080-8083, 9090, 3100, 5432
+- Ports: 3000, 8080-8083, 9090, 3100, 5432, 12345
 
 ---
 
@@ -191,18 +193,18 @@ Options:
        │
        ├──────────┬──────────┬──────────┐
        │          │          │          │
-┌──────▼─────┐ ┌─▼────┐ ┌───▼────┐ ┌──▼──────┐
-│ Prometheus │ │ Loki │ │Postgres│ │Promtail │
-│   :9090    │ │:3100 │ │ :5432  │ │         │
-└──────┬─────┘ └──┬───┘ └───┬────┘ └─────────┘
-       │          │         │
-       └──────────┴─────────┴──────────────┐
-                                            │
-     ┌──────────────────────────────────────▼─┐
-     │          Microservices                  │
-     │  API│Frontend│Payment│Inventory         │
-     │  8080  8081    8082   8083              │
-     └──────────────────────────────────────────┘
+┌──────▼─────┐ ┌─▼────┐ ┌───▼────┐ ┌──▼─────┐
+│ Prometheus │ │ Loki │ │Postgres│ │ Alloy  │
+│   :9090    │ │:3100 │ │ :5432  │ │ :12345 │
+└──────┬─────┘ └──┬───┘ └───┬────┘ └────┬───┘
+       │          │         │            │
+       └──────────┴─────────┴────────────┴───┐
+                                              │
+       ┌──────────────────────────────────────▼─┐
+       │          Microservices                  │
+       │  API│Frontend│Payment│Inventory         │
+       │  8080  8081    8082   8083              │
+       └──────────────────────────────────────────┘
 ```
 
 ---
@@ -214,10 +216,13 @@ Options:
 | Grafana | http://localhost:3000 | admin / admin |
 | Prometheus | http://localhost:9090 | - |
 | Loki | http://localhost:3100 | - |
+| Alloy UI | http://localhost:12345 | - |
 | API | http://localhost:8080/health | - |
 | Frontend | http://localhost:8081/health | - |
 | Payment | http://localhost:8082/health | - |
 | Inventory | http://localhost:8083/health | - |
+
+💡 **Explore Alloy:** Visit the Alloy UI at http://localhost:12345 to see the component graph, view collected logs in real-time, and debug the configuration.
 
 ---
 
@@ -422,6 +427,10 @@ docker compose down -v
 docker rmi shopfast-simulator
 ```
 
+### Migration Note
+
+If you previously used this demo with Promtail, the old `loki/promtail-config.yml` file is no longer needed. The new Alloy configuration is in `alloy/config.alloy` using the modern River syntax.
+
 ---
 
 ## Platform Support
@@ -451,10 +460,11 @@ Or use WSL/Git Bash for `.sh` scripts.
 1. **Services start** via `docker-compose.yml`
 2. **Grafana auto-provisions** data sources and alert rules
 3. **Simulator generates traffic** via Dockerized Python script
-4. **Services emit** metrics (Prometheus), logs (Loki), and data (PostgreSQL)
-5. **Grafana evaluates** alert rules every 30 seconds
-6. **Alerts fire** when conditions are met
-7. **Notifications sent** (if configured)
+4. **Services emit** metrics (Prometheus), logs (to files), and data (PostgreSQL)
+5. **Alloy collects logs** from service log files and forwards to Loki
+6. **Grafana evaluates** alert rules every 30 seconds
+7. **Alerts fire** when conditions are met
+8. **Notifications sent** (if configured)
 
 ---
 

@@ -5,7 +5,7 @@ REM No Python installation required - runs in Docker!
 setlocal enabledelayedexpansion
 
 set IMAGE_NAME=shopfast-simulator
-set NETWORK_NAME=demo-alerting-stack_monitoring
+set NETWORK_NAME=shop-fast-alerting-demo_monitoring
 
 REM Check if Docker is running
 docker ps >nul 2>&1

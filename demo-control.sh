@@ -21,7 +21,7 @@ echo "╔═══════════════════════�
 echo "║         📊 ShopFast Database Control Panel 📊            ║"
 echo "╚════════════════════════════════════════════════════════════╝"
 echo ""
-echo "Current Stock Levels (Sorted by Stock):"
+echo "Current Stock Levels:"
 $DB_EXEC "
     SELECT 
         id,
@@ -37,7 +37,7 @@ $DB_EXEC "
             ELSE '🟢 OK'
         END as status
     FROM products 
-    ORDER BY stock_level ASC;
+    ORDER BY id ASC;
 " 2>/dev/null
 echo ""
 echo "💡 TIP: Press 'q' or '8' to exit at any time"
@@ -305,7 +305,7 @@ while true; do
     echo "║         📊 ShopFast Database Control Panel 📊            ║"
     echo "╚════════════════════════════════════════════════════════════╝"
     echo ""
-    echo "Current Stock Levels (Sorted by Stock):"
+    echo "Current Stock Levels:"
     $DB_EXEC "
         SELECT 
             id,
@@ -321,7 +321,7 @@ while true; do
                 ELSE '🟢 OK'
             END as status
         FROM products 
-        ORDER BY stock_level ASC;
+        ORDER BY id ASC;
     " 2>/dev/null
     echo ""
     echo "💡 TIP: Press 'q' or '8' to exit at any time"

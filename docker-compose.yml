@@ -48,15 +48,17 @@ services:
     networks:
       - monitoring
 
-  # Promtail (log collector for Loki)
-  promtail:
-    image: grafana/promtail:latest
-    container_name: shopfast-promtail
+  # Alloy (unified observability collector)
+  alloy:
+    image: grafana/alloy:latest
+    container_name: shopfast-alloy
     volumes:
-      - ./loki/promtail-config.yml:/etc/promtail/config.yml
+      - ./alloy/config.alloy:/etc/alloy/config.alloy
       - /var/log:/var/log
       - ./logs:/app/logs
-    command: -config.file=/etc/promtail/config.yml
+    command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+    ports:
+      - "12345:12345"  # Alloy UI
     networks:
       - monitoring
     depends_on:

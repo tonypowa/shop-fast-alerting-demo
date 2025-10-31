@@ -41,7 +41,7 @@ run_simulation() {
     echo ""
     
     docker run --rm \
-        --network demo-alerting-stack_monitoring \
+        --network shop-fast-alerting-demo_monitoring \
         -e API_URL="http://shopfast-api:8080" \
         -e FRONTEND_URL="http://shopfast-frontend:8081" \
         -e PAYMENT_URL="http://shopfast-payment:8082" \
@@ -144,11 +144,38 @@ while true; do
                 echo "  9. Laptop Stand (Stock: 100)"
                 echo " 10. Phone Charger (Stock: 300)"
                 echo ""
-                read -p "Select Product ID [1-10, default: 1]: " product_id
-                product_id=${product_id:-1}
+                read -p "Select Product ID(s) [e.g., 1 or 1,3,5 or 1-4, default: 1]: " product_input
+                product_input=${product_input:-1}
                 read -p "Duration in seconds [30]: " duration
                 duration=${duration:-30}
-                run_simulation "flash-sale" --product-id "$product_id" --duration "$duration"
+                
+                # Parse input (supports: "1", "1,3,5", "1-4")
+                IFS=',' read -ra PRODUCTS <<< "$product_input"
+                for prod in "${PRODUCTS[@]}"; do
+                    if [[ $prod =~ ^([0-9]+)-([0-9]+)$ ]]; then
+                        # Range format: 1-4
+                        start=${BASH_REMATCH[1]}
+                        end=${BASH_REMATCH[2]}
+                        for ((i=start; i<=end; i++)); do
+                            if [[ $i -ge 1 && $i -le 10 ]]; then
+                                run_simulation "flash-sale" --product-id "$i" --duration "$duration"
+                            else
+                                echo "⚠️  Skipping invalid product ID: $i"
+                            fi
+                        done
+                    elif [[ $prod =~ ^[0-9]+$ ]]; then
+                        # Single number
+                        product_id=$prod
+                        if [[ $product_id -ge 1 && $product_id -le 10 ]]; then
+                            run_simulation "flash-sale" --product-id "$product_id" --duration "$duration"
+                        else
+                            echo "⚠️  Skipping invalid product ID: $product_id"
+                        fi
+                    else
+                        echo "⚠️  Skipping invalid input: $prod"
+                    fi
+                done
+                
                 echo ""
                 echo "💡 TIP: Check Grafana → Alerting → Alert rules"
                 echo "   Look for 'Low Inventory Warning' alert"
@@ -198,9 +225,35 @@ while true; do
                 echo "  9. Laptop Stand (Stock: 100)"
                 echo " 10. Phone Charger (Stock: 300)"
                 echo ""
-                read -p "Select Product ID [1-10, default: 6]: " product_id
-                product_id=${product_id:-6}
-                run_simulation "low-inventory" --product-id "$product_id"
+                read -p "Select Product ID(s) [e.g., 1 or 1,3,5 or 1-4, default: 6]: " product_input
+                product_input=${product_input:-6}
+                
+                # Parse input (supports: "1", "1,3,5", "1-4")
+                IFS=',' read -ra PRODUCTS <<< "$product_input"
+                for prod in "${PRODUCTS[@]}"; do
+                    if [[ $prod =~ ^([0-9]+)-([0-9]+)$ ]]; then
+                        # Range format: 1-4
+                        start=${BASH_REMATCH[1]}
+                        end=${BASH_REMATCH[2]}
+                        for ((i=start; i<=end; i++)); do
+                            if [[ $i -ge 1 && $i -le 10 ]]; then
+                                run_simulation "low-inventory" --product-id "$i"
+                            else
+                                echo "⚠️  Skipping invalid product ID: $i"
+                            fi
+                        done
+                    elif [[ $prod =~ ^[0-9]+$ ]]; then
+                        # Single number
+                        product_id=$prod
+                        if [[ $product_id -ge 1 && $product_id -le 10 ]]; then
+                            run_simulation "low-inventory" --product-id "$product_id"
+                        else
+                            echo "⚠️  Skipping invalid product ID: $product_id"
+                        fi
+                    else
+                        echo "⚠️  Skipping invalid input: $prod"
+                    fi
+                done
                 break
                 ;;
             8)
