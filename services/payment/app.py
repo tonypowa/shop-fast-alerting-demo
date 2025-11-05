@@ -5,7 +5,35 @@ import time
 import os
 import random
 
+# OpenTelemetry imports
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
+
+# Initialize Flask app
 app = Flask(__name__)
+
+# Configure OpenTelemetry
+resource = Resource.create({"service.name": "payment-service"})
+trace.set_tracer_provider(TracerProvider(resource=resource))
+tracer = trace.get_tracer(__name__)
+
+# Configure OTLP exporter to send traces to Alloy
+otlp_exporter = OTLPSpanExporter(
+    endpoint="http://alloy:4317",
+    insecure=True
+)
+trace.get_tracer_provider().add_span_processor(
+    BatchSpanProcessor(otlp_exporter)
+)
+
+# Auto-instrument Flask
+FlaskInstrumentor().instrument_app(app)
+RequestsInstrumentor().instrument()
 
 # Configure logging
 log_file = os.getenv('LOG_FILE', '/app/logs/payment.log')

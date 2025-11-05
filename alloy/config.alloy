@@ -1,5 +1,9 @@
 // Grafana Alloy Configuration for ShopFast Demo
-// This replaces Promtail with the modern unified observability collector
+// Unified observability collector for logs and traces
+
+// ============================================
+// LOGS COLLECTION
+// ============================================
 
 // Discover log files in the shared logs directory
 local.file_match "shopfast_logs" {
@@ -45,6 +49,45 @@ loki.process "parse_logs" {
 loki.write "loki_endpoint" {
   endpoint {
     url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+
+// ============================================
+// TRACES COLLECTION
+// ============================================
+
+// Receive traces from instrumented services via OTLP
+otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+  
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+
+  output {
+    traces = [otelcol.processor.batch.default.input]
+  }
+}
+
+// Batch traces for efficiency before sending to Tempo
+otelcol.processor.batch "default" {
+  timeout = "5s"
+  send_batch_size = 100
+  
+  output {
+    traces = [otelcol.exporter.otlp.tempo.input]
+  }
+}
+
+// Forward traces to Tempo
+otelcol.exporter.otlp "tempo" {
+  client {
+    endpoint = "tempo:4317"
+    tls {
+      insecure = true
+    }
   }
 }
 

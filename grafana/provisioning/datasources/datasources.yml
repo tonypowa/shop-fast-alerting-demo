@@ -38,3 +38,30 @@ datasources:
     secureJsonData:
       password: shopfast123
 
+  # Tempo (Distributed Tracing)
+  - name: Tempo
+    type: tempo
+    uid: tempo
+    access: proxy
+    url: http://tempo:3200
+    editable: true
+    jsonData:
+      # Correlate traces with logs in Loki
+      tracesToLogsV2:
+        datasourceUid: loki
+        spanStartTimeShift: '-1h'
+        spanEndTimeShift: '1h'
+        tags: ['service']
+        filterByTraceID: true
+      # Correlate traces with metrics in Prometheus
+      tracesToMetrics:
+        datasourceUid: prometheus
+        spanStartTimeShift: '-1h'
+        spanEndTimeShift: '1h'
+      # Enable Loki search from trace view
+      lokiSearch:
+        datasourceUid: loki
+      # Service graph (requires metrics generator in Tempo)
+      serviceMap:
+        datasourceUid: prometheus
+

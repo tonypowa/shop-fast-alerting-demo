@@ -1,6 +1,6 @@
-# ShopFast - Grafana Alerting Demo
+# ShopFast - Grafana Observability Demo
 
-Complete Grafana alerting demonstration with real-world e-commerce scenarios. Shows alerting across Prometheus (metrics), Loki (logs), and PostgreSQL (business data).
+Complete Grafana observability demonstration with real-world e-commerce scenarios. Showcases **metrics** (Prometheus), **logs** (Loki), **traces** (Tempo), and **alerting** across all data sources - with full correlation!
 
 ```
 ╔════════════════════════════════════════════════════════════╗
@@ -76,10 +76,14 @@ docker compose up -d
 **Observability Stack:**
 - Grafana 12 - Dashboards and alerting
 - Prometheus - Metrics collection
-- Loki + Alloy - Log aggregation (modern unified collector)
+- Loki + Alloy - Log aggregation
+- **Tempo - Distributed tracing** ⭐ NEW!
+- Alloy - Unified observability collector (logs + traces)
 - PostgreSQL - Business database
 
-> 🚀 **Why Alloy?** This demo uses Grafana Alloy, the modern replacement for Promtail. Alloy is Grafana's unified observability collector with better performance, cleaner configuration syntax (River), and support for logs, metrics, and traces in one agent.
+> 🚀 **Why Alloy?** This demo uses Grafana Alloy, the modern unified observability collector. Alloy collects both logs AND traces from your services, forwarding logs to Loki and traces to Tempo. It features better performance, cleaner configuration syntax (River), and native support for OpenTelemetry.
+
+> 🔍 **Complete Observability:** This demo showcases the **three pillars of observability**: metrics (Prometheus), logs (Loki), and **traces (Tempo)** - all correlated in Grafana for powerful debugging!
 
 **Microservices:**
 - API Service (8080) - Product catalog and orders
@@ -105,7 +109,76 @@ docker compose up -d
 
 - Docker Desktop or Docker Engine + Docker Compose
 - 4GB RAM available
-- Ports: 3000, 8080-8083, 9090, 3100, 5432, 12345
+- Ports: 3000, 3200, 8080-8083, 9090, 3100, 4317, 4318, 5432, 12345
+
+---
+
+## 🔍 Distributed Tracing with OpenTelemetry
+
+This demo includes **distributed tracing** to track requests across all microservices!
+
+### What You Get
+
+**Request Flow Visibility:**
+- See the complete journey of a request from frontend → API → payment
+- Identify bottlenecks and latency issues
+- Track errors to the exact service and operation
+
+**Automatic Instrumentation:**
+- All services instrumented with OpenTelemetry
+- Auto-traces HTTP requests, database queries, and service calls
+- No manual span creation needed (but you can add custom spans!)
+
+**Full Correlation:**
+- 🔗 **Trace → Logs**: Click a trace span to see related logs
+- 🔗 **Trace → Metrics**: Jump from trace to metrics at that timestamp
+- 🔗 **Logs → Trace**: Find the trace for any log entry
+
+### How to Use Traces
+
+1. **Run a simulation** to generate requests:
+   ```bash
+   ./run-simulation.sh
+   # Select any scenario (e.g., Flash Sale)
+   ```
+
+2. **Open Grafana** → **Explore** → Select **Tempo**
+
+3. **Search for traces:**
+   - Search by service: `service.name="api-service"`
+   - Search by operation: `name="POST /api/orders"`
+   - Or use TraceQL: `{ span.http.status_code = 500 }`
+
+4. **Explore the trace:**
+   - See timing breakdown across services
+   - Click spans to view tags and logs
+   - Click "Logs for this span" to jump to correlated logs
+   - Click "View metrics" to see prometheus data
+
+### Example: Order Processing Trace
+
+```
+Flash Sale Order Trace (Total: 450ms)
+├─ Frontend: GET /checkout [120ms]
+├─ API: POST /api/orders [280ms]
+│  ├─ Database: SELECT products [45ms]
+│  ├─ Database: INSERT orders [30ms]
+│  └─ Payment: POST /api/payment/process [180ms] ⚠️ SLOW!
+└─ Inventory: GET /api/inventory/status [50ms]
+```
+
+### Technical Details
+
+**Stack:**
+- **Instrumentation**: OpenTelemetry Python SDK (auto-instrumentation for Flask, psycopg2, requests)
+- **Collection**: Grafana Alloy (OTLP receiver on ports 4317/4318)
+- **Storage**: Grafana Tempo (local storage, 48h retention)
+- **Visualization**: Grafana (with full correlation features)
+
+**Architecture:**
+```
+Services (OTel SDK) → Alloy (OTLP) → Tempo → Grafana
+```
 
 ---
 
@@ -192,21 +265,30 @@ Options:
 │   Grafana   │ ← Port 3000
 └──────┬──────┘
        │
-       ├──────────┬──────────┬──────────┐
-       │          │          │          │
-┌──────▼─────┐ ┌─▼────┐ ┌───▼────┐ ┌──▼─────┐
-│ Prometheus │ │ Loki │ │Postgres│ │ Alloy  │
-│   :9090    │ │:3100 │ │ :5432  │ │ :12345 │
-└──────┬─────┘ └──┬───┘ └───┬────┘ └────┬───┘
-       │          │         │            │
-       └──────────┴─────────┴────────────┴───┐
-                                              │
-       ┌──────────────────────────────────────▼─┐
-       │          Microservices                  │
-       │  API│Frontend│Payment│Inventory         │
-       │  8080  8081    8082   8083              │
-       └──────────────────────────────────────────┘
+       ├────────────┬──────────┬──────────┬──────────┐
+       │            │          │          │          │
+┌──────▼─────┐ ┌───▼────┐ ┌──▼────┐ ┌───▼────┐ ┌──▼─────┐
+│ Prometheus │ │  Loki  │ │ Tempo │ │Postgres│ │ Alloy  │
+│   :9090    │ │ :3100  │ │ :3200 │ │ :5432  │ │ :12345 │
+└──────┬─────┘ └────▲───┘ └───▲───┘ └───┬────┘ └────┬───┘
+       │            │         │          │           │
+       │      ┌─────┴─────────┴──────────┘           │
+       │      │   Logs & Traces Collector            │
+       │      │   (Ports 4317/4318 OTLP)             │
+       │      │                                       │
+       └──────┴───────────────────────────────────────┴───┐
+                                                           │
+       ┌───────────────────────────────────────────────────▼─┐
+       │          Microservices (OTel Instrumented)          │
+       │  API│Frontend│Payment│Inventory                     │
+       │  8080  8081    8082   8083                          │
+       └─────────────────────────────────────────────────────┘
 ```
+
+**Data Flow:**
+- **Metrics**: Prometheus scrapes services directly (pull model)
+- **Logs**: Services write to files → Alloy reads → forwards to Loki
+- **Traces**: Services send OTLP to Alloy → Alloy forwards to Tempo
 
 ---
 
@@ -217,13 +299,16 @@ Options:
 | Grafana | http://localhost:3000 | admin / admin |
 | Prometheus | http://localhost:9090 | - |
 | Loki | http://localhost:3100 | - |
+| **Tempo** | **http://localhost:3200** | **-** |
 | Alloy UI | http://localhost:12345 | - |
 | API | http://localhost:8080/health | - |
 | Frontend | http://localhost:8081/health | - |
 | Payment | http://localhost:8082/health | - |
 | Inventory | http://localhost:8083/health | - |
 
-💡 **Explore Alloy:** Visit the Alloy UI at http://localhost:12345 to see the component graph, view collected logs in real-time, and debug the configuration.
+💡 **Explore Observability:**
+- **Alloy UI** (http://localhost:12345): See component graph, collected logs/traces, and debug configuration
+- **Grafana Explore**: Query traces in Tempo, click through to correlated logs and metrics!
 
 ---
 
@@ -461,11 +546,14 @@ Or use WSL/Git Bash for `.sh` scripts.
 1. **Services start** via `docker-compose.yml`
 2. **Grafana auto-provisions** data sources and alert rules
 3. **Simulator generates traffic** via Dockerized Python script
-4. **Services emit** metrics (Prometheus), logs (to files), and data (PostgreSQL)
-5. **Alloy collects logs** from service log files and forwards to Loki
+4. **Services emit observability data:**
+   - **Metrics** → Prometheus (scraped via /metrics endpoint)
+   - **Logs** → Log files → Alloy → Loki
+   - **Traces** → OpenTelemetry OTLP → Alloy → Tempo
+5. **Alloy acts as collector** for logs and traces
 6. **Grafana evaluates** alert rules every 30 seconds
 7. **Alerts fire** when conditions are met
-8. **Notifications sent** (if configured)
+8. **Full correlation** available: traces ↔ logs ↔ metrics
 
 ---
 
@@ -493,6 +581,7 @@ See [TALK_NOTES.md](TALK_NOTES.md) for a complete presentation guide.
 ## Additional Documentation
 
 - **[DATABASE_SCHEMA.md](DATABASE_SCHEMA.md)** - Complete database schema and queries
+- **[TRACES.md](TRACES.md)** - Distributed tracing guide with examples and troubleshooting ⭐ NEW!
 - **[TALK_NOTES.md](TALK_NOTES.md)** - Presentation script with timing and Q&A prep
 
 ---
@@ -504,6 +593,8 @@ See [TALK_NOTES.md](TALK_NOTES.md) for a complete presentation guide.
 ✅ Pre-configured - 7 alerts ready to demo  
 ✅ Interactive controls - Easy-to-use CLI menus  
 ✅ Multi-source alerts - Prometheus, Loki, PostgreSQL  
+✅ **Distributed tracing** - OpenTelemetry + Tempo ⭐ NEW!  
+✅ **Full correlation** - Traces ↔ Logs ↔ Metrics  
 ✅ Realistic scenarios - E-commerce use cases  
 ✅ Quick reset - Database control panel  
 

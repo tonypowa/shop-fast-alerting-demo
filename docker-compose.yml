@@ -48,6 +48,20 @@ services:
     networks:
       - monitoring
 
+  # Tempo (distributed tracing backend)
+  tempo:
+    image: grafana/tempo:latest
+    container_name: shopfast-tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./tempo/tempo.yml:/etc/tempo.yaml
+      - tempo-data:/var/tempo
+    ports:
+      - "3200:3200"   # Tempo HTTP (for Grafana queries)
+      # OTLP ports (4317, 4318) are only internal - Alloy forwards to Tempo
+    networks:
+      - monitoring
+
   # Alloy (unified observability collector)
   alloy:
     image: grafana/alloy:latest
@@ -59,10 +73,13 @@ services:
     command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
     ports:
       - "12345:12345"  # Alloy UI
+      - "4317:4317"    # OTLP gRPC - for receiving traces from services
+      - "4318:4318"    # OTLP HTTP - for receiving traces from services
     networks:
       - monitoring
     depends_on:
       - loki
+      - tempo
 
   # Grafana
   grafana:
@@ -169,5 +186,6 @@ volumes:
   postgres-data:
   prometheus-data:
   loki-data:
+  tempo-data:
   grafana-data:
 
