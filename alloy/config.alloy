@@ -1,5 +1,50 @@
 // Grafana Alloy Configuration for ShopFast Demo
-// Unified observability collector for logs and traces
+// Unified observability collector for logs, metrics, and traces
+
+// ============================================
+// METRICS COLLECTION
+// ============================================
+
+// Scrape Prometheus metrics from services
+prometheus.scrape "shopfast_metrics" {
+  targets = [
+    {
+      __address__ = "shopfast-api:8080",
+      job         = "api-service",
+    },
+    {
+      __address__ = "shopfast-frontend:8081",
+      job         = "frontend-service",
+    },
+    {
+      __address__ = "shopfast-payment:8082",
+      job         = "payment-service",
+    },
+    {
+      __address__ = "shopfast-inventory:8083",
+      job         = "inventory-service",
+    },
+  ]
+  
+  forward_to      = [prometheus.remote_write.prometheus.receiver]
+  scrape_interval = "15s"
+  scrape_timeout  = "10s"
+}
+
+// Send metrics to Prometheus via remote write
+prometheus.remote_write "prometheus" {
+  endpoint {
+    url = "http://prometheus:9090/api/v1/write"
+    
+    queue_config {
+      capacity             = 10000
+      max_shards           = 10
+      min_shards           = 1
+      max_samples_per_send = 5000
+      batch_send_deadline  = "5s"
+    }
+  }
+}
 
 // ============================================
 // LOGS COLLECTION

@@ -17,17 +17,40 @@ The `config.alloy` file uses the **River** configuration language, which is:
 - Has better type safety and validation
 - Provides a visual component graph in the UI
 
+## Unified Collection
+
+This configuration demonstrates **Alloy as a unified collector** for all three pillars of observability:
+
+```
+Services
+   ↓
+Alloy (single collector)
+   ├→ Prometheus (metrics)
+   ├→ Loki (logs)
+   └→ Tempo (traces)
+```
+
 ## Components
 
 The configuration consists of these components:
 
-### 1. `local.file_match "shopfast_logs"`
+### Metrics Collection
+
+#### 1. `prometheus.scrape "shopfast_metrics"`
+Scrapes `/metrics` endpoints from all 4 services every 15 seconds. Targets are defined inline with job labels for each service.
+
+#### 2. `prometheus.remote_write "prometheus"`
+Sends collected metrics to Prometheus via remote write API with optimized batching (queue capacity: 10k samples, batch deadline: 5s).
+
+### Logs Collection
+
+#### 1. `local.file_match "shopfast_logs"`
 Discovers log files matching the pattern `/app/logs/*.log`
 
-### 2. `loki.source.file "shopfast_services"`
+#### 2. `loki.source.file "shopfast_services"`
 Tails the discovered log files and forwards content to the next component
 
-### 3. `loki.process "parse_logs"`
+#### 3. `loki.process "parse_logs"`
 Parses log lines to extract:
 - **timestamp** - ISO 8601 timestamp
 - **level** - Log level (INFO, ERROR, etc.)
@@ -36,8 +59,19 @@ Parses log lines to extract:
 
 These are converted to Loki labels for filtering and alerting.
 
-### 4. `loki.write "loki_endpoint"`
+#### 4. `loki.write "loki_endpoint"`
 Sends processed logs to Loki at `http://loki:3100`
+
+### Traces Collection
+
+#### 1. `otelcol.receiver.otlp "default"`
+Receives traces from instrumented services via OTLP on ports 4317 (gRPC) and 4318 (HTTP).
+
+#### 2. `otelcol.processor.batch "default"`
+Batches traces for efficiency (5s timeout, 100 spans per batch) before forwarding.
+
+#### 3. `otelcol.exporter.otlp "tempo"`
+Forwards traces to Tempo at `tempo:4317` via gRPC.
 
 ## Expected Log Format
 

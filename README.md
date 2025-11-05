@@ -75,13 +75,13 @@ docker compose up -d
 
 **Observability Stack:**
 - Grafana 12 - Dashboards and alerting
-- Prometheus - Metrics collection
-- Loki + Alloy - Log aggregation
-- **Tempo - Distributed tracing** ⭐ NEW!
-- Alloy - Unified observability collector (logs + traces)
+- **Alloy - Unified observability collector** ⭐ (metrics, logs, traces)
+- Prometheus - Metrics storage
+- Loki - Log storage
+- Tempo - Trace storage
 - PostgreSQL - Business database
 
-> 🚀 **Why Alloy?** This demo uses Grafana Alloy, the modern unified observability collector. Alloy collects both logs AND traces from your services, forwarding logs to Loki and traces to Tempo. It features better performance, cleaner configuration syntax (River), and native support for OpenTelemetry.
+> 🚀 **Why Alloy?** This demo showcases Grafana Alloy as a **true unified collector** for all three pillars of observability. Instead of multiple agents (Promtail for logs, Prometheus for metrics, separate trace collector), Alloy does it all! It collects metrics, logs, AND traces from your services and routes them to the appropriate backends (Prometheus, Loki, Tempo). This simplifies your architecture, reduces resource usage, and provides better visibility into your telemetry pipeline via the built-in UI.
 
 > 🔍 **Complete Observability:** This demo showcases the **three pillars of observability**: metrics (Prometheus), logs (Loki), and **traces (Tempo)** - all correlated in Grafana for powerful debugging!
 
@@ -285,10 +285,16 @@ Options:
        └─────────────────────────────────────────────────────┘
 ```
 
-**Data Flow:**
-- **Metrics**: Prometheus scrapes services directly (pull model)
+**Data Flow (Unified via Alloy):**
+- **Metrics**: Alloy scrapes services → forwards to Prometheus via remote write
 - **Logs**: Services write to files → Alloy reads → forwards to Loki
 - **Traces**: Services send OTLP to Alloy → Alloy forwards to Tempo
+
+**Why This is Better:**
+- ✅ Single collector agent (Alloy) for all telemetry
+- ✅ Reduced resource footprint vs. multiple agents
+- ✅ Centralized configuration and debugging via Alloy UI
+- ✅ Better visibility into the collection pipeline
 
 ---
 
