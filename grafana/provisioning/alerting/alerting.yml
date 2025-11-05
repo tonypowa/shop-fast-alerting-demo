@@ -47,7 +47,7 @@ groups:
               to: 0
             datasourceUid: prometheus
             model:
-              expr: 'rate(http_requests_total{status=~"5.."}[5m]) > 0.1'
+              expr: 'rate(http_requests_total{code=~"5.."}[5m]) > 0.1'
               refId: A
         noDataState: NoData
         execErrState: Error
@@ -95,7 +95,7 @@ groups:
               to: 0
             datasourceUid: loki
             model:
-              expr: 'sum(count_over_time({service="payment"} |~ "ERROR|payment failed" [5m])) > 5'
+              expr: 'sum(count_over_time({service_name="shopfast-services", filename="/app/logs/payment.log"} |= "ERROR" [5m])) > 5'
               refId: A
         noDataState: NoData
         execErrState: Error

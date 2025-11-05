@@ -72,7 +72,7 @@ def health():
 
 @app.route('/metrics', methods=['GET'])
 def metrics():
-    return generate_latest(REGISTRY)
+    return generate_latest(REGISTRY), 200, {'Content-Type': 'text/plain; charset=utf-8'}
 
 @app.route('/api/products', methods=['GET'])
 def get_products():

@@ -5,32 +5,36 @@ global:
 scrape_configs:
   # API Service metrics
   - job_name: 'api-service'
+    scrape_protocols: ['PrometheusText0.0.4']
     static_configs:
-      - targets: ['api-service:8080']
+      - targets: ['shopfast-api:8080']
         labels:
           service: 'api'
           environment: 'demo'
 
   # Frontend Service metrics
   - job_name: 'frontend-service'
+    scrape_protocols: ['PrometheusText0.0.4']
     static_configs:
-      - targets: ['frontend-service:8081']
+      - targets: ['shopfast-frontend:8081']
         labels:
           service: 'frontend'
           environment: 'demo'
 
   # Payment Service metrics
   - job_name: 'payment-service'
+    scrape_protocols: ['PrometheusText0.0.4']
     static_configs:
-      - targets: ['payment-service:8082']
+      - targets: ['shopfast-payment:8082']
         labels:
           service: 'payment'
           environment: 'demo'
 
   # Inventory Service metrics
   - job_name: 'inventory-service'
+    scrape_protocols: ['PrometheusText0.0.4']
     static_configs:
-      - targets: ['inventory-service:8083']
+      - targets: ['shopfast-inventory:8083']
         labels:
           service: 'inventory'
           environment: 'demo'
