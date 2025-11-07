@@ -1,6 +1,6 @@
 # ShopFast - Grafana Alerting Demo
 
-Complete Grafana alerting demonstration with real-world e-commerce scenarios. Showcases **metrics** (Prometheus), **logs** (Loki), and **database queries** (PostgreSQL) with powerful alerting and correlation!
+Complete Grafana alerting demonstration with real-world e-commerce scenarios. Showcases **metrics** (Prometheus), **logs** (Loki), and **database queries** (PostgreSQL) with alerting 
 
 ```
 ╔════════════════════════════════════════════════════════════╗
@@ -82,7 +82,7 @@ docker compose up -d
 
 > 🚀 **Why Alloy?** This demo showcases Grafana Alloy as a **unified collector** for metrics and logs. Instead of multiple agents (Promtail for logs, separate Prometheus exporters), Alloy does it all! It collects metrics and logs from your services and routes them to the appropriate backends (Prometheus, Loki). This simplifies your architecture, reduces resource usage, and provides better visibility into your telemetry pipeline via the built-in UI.
 
-> 🔍 **Complete Alerting:** This demo showcases **multi-source alerting**: metrics (Prometheus), logs (Loki), and database queries (PostgreSQL) - all monitored in Grafana for powerful alerting and correlation!
+> 🔍 **Complete Alerting:** This demo showcases **multi-source alerting**: metrics (Prometheus), logs (Loki), and database queries (PostgreSQL) - all monitored in Grafana for alerting
 
 **Microservices:**
 - API Service (8080) - Product catalog and orders
@@ -244,7 +244,7 @@ Options:
 💡 **Explore Observability:**
 - **Frontend UI** (http://localhost:8081/): Watch real-time inventory updates during simulations!
 - **Alloy UI** (http://localhost:12345): See component graph and collected telemetry
-- **Grafana Explore**: Query metrics and logs, correlate by time!
+- **Grafana Explore**: Query metrics and logs
 
 ---
 
@@ -277,7 +277,7 @@ docker compose up -d
 # Select: 1 (Reset to Default)
 ```
 
-💡 **Why this works so well:** The simulation tool generates realistic HTTP requests over time, showing how alerts naturally fire as inventory depletes - much more impressive than instant database changes!
+💡  The simulation tool generates realistic HTTP requests over time, showing how alerts naturally fire as inventory depletes - much more impressive than instant database changes!
 
 ---
 
@@ -488,7 +488,6 @@ Or use WSL/Git Bash for `.sh` scripts.
 5. **Alloy acts as collector** for logs
 6. **Grafana evaluates** alert rules every 30 seconds
 7. **Alerts fire** when conditions are met
-8. **Time-based correlation** available: logs ↔ metrics ↔ database queries
 
 ---
 
@@ -516,24 +515,9 @@ See [TALK_NOTES.md](TALK_NOTES.md) for a complete presentation guide.
 ## Additional Documentation
 
 - **[DATABASE_SCHEMA.md](DATABASE_SCHEMA.md)** - Complete database schema and queries
-- **[CORRELATION_DEMO.md](CORRELATION_DEMO.md)** - Guide for demonstrating metrics & logs correlation
+- **[CORRELATION_DEMO.md](CORRELATION_DEMO.md)** - Guide for demonstrating metrics & logs
 - **[TALK_NOTES.md](TALK_NOTES.md)** - Presentation script with timing and Q&A prep
 
----
-
-## Key Features
-
-✅ Zero Python setup - Simulator runs in Docker  
-✅ Cross-platform - Works on Linux, Mac, Windows  
-✅ Pre-configured - 7 alerts ready to demo  
-✅ Interactive controls - Easy-to-use CLI menus  
-✅ Multi-source alerts - Prometheus, Loki, PostgreSQL  
-✅ **Real-time UI** - Watch inventory levels update live ⭐ NEW!  
-✅ **Time-based correlation** - Metrics ↔ Logs ↔ Database  
-✅ Realistic scenarios - E-commerce use cases  
-✅ Quick reset - Database control panel  
-
----
 
 ## Support
 
