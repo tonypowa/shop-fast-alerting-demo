@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from prometheus_client import Counter, Histogram, generate_latest, REGISTRY
 import psycopg2
 import logging
@@ -18,6 +19,9 @@ from opentelemetry.instrumentation.requests import RequestsInstrumentor
 
 # Initialize Flask app
 app = Flask(__name__)
+
+# Enable CORS for frontend access
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Configure OpenTelemetry
 resource = Resource.create({"service.name": "api-service"})
@@ -80,7 +84,7 @@ def get_products():
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute('SELECT id, name, description, price, stock_level FROM products')
+        cur.execute('SELECT id, name, description, price, stock_level, low_stock_threshold FROM products')
         products = cur.fetchall()
         cur.close()
         conn.close()
@@ -91,7 +95,8 @@ def get_products():
                 'name': p[1],
                 'description': p[2],
                 'price': float(p[3]),
-                'stock_level': p[4]
+                'stock_level': p[4],
+                'low_stock_threshold': p[5]
             }
             for p in products
         ]

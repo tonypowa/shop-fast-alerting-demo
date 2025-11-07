@@ -25,7 +25,9 @@
             <div class="product-info">
                 <h3>Gaming Laptop</h3>
                 <p class="product-price">$1,299.99</p>
-                <div class="stock-info stock-high">✓ In Stock (50 units)</div>
+                <div class="stock-info stock-high" data-product-id="1" id="stock-1">
+                    Loading...
+                </div>
                 <a href="/products" class="btn">View Products</a>
             </div>
         </div>
@@ -34,8 +36,10 @@
             <div class="product-image">🖱️</div>
             <div class="product-info">
                 <h3>Wireless Mouse</h3>
-                <p class="product-price">$49.99</p>
-                <div class="stock-info stock-high">✓ In Stock (150 units)</div>
+                <p class="product-price">$29.99</p>
+                <div class="stock-info stock-high" data-product-id="2" id="stock-2">
+                    Loading...
+                </div>
                 <a href="/products" class="btn">View Products</a>
             </div>
         </div>
@@ -44,8 +48,10 @@
             <div class="product-image">⌨️</div>
             <div class="product-info">
                 <h3>Mechanical Keyboard</h3>
-                <p class="product-price">$129.99</p>
-                <div class="stock-info stock-medium">⚠ Low Stock (75 units)</div>
+                <p class="product-price">$89.99</p>
+                <div class="stock-info stock-medium" data-product-id="3" id="stock-3">
+                    Loading...
+                </div>
                 <a href="/products" class="btn">View Products</a>
             </div>
         </div>
@@ -54,8 +60,10 @@
             <div class="product-image">🎧</div>
             <div class="product-info">
                 <h3>Noise Cancelling Headphones</h3>
-                <p class="product-price">$199.99</p>
-                <div class="stock-info stock-high">✓ In Stock (100 units)</div>
+                <p class="product-price">$299.99</p>
+                <div class="stock-info stock-high" data-product-id="7" id="stock-7">
+                    Loading...
+                </div>
                 <a href="/products" class="btn">View Products</a>
             </div>
         </div>
@@ -71,5 +79,50 @@
         </ul>
     </div>
 </div>
-{% endblock %}
 
+<script>
+const API_URL = 'http://localhost:8080/api/products';
+
+function getStockClass(stockLevel, threshold) {
+    if (stockLevel <= 5) return 'stock-low';  // Critical
+    if (stockLevel <= threshold * 1.5) return 'stock-medium';  // Warning zone
+    return 'stock-high';  // Good stock
+}
+
+function getStockText(stockLevel, threshold) {
+    if (stockLevel <= 5) return `⚠ Critical Stock (${stockLevel} units)`;
+    if (stockLevel <= threshold * 1.5) return `⚠ Low Stock (${stockLevel} units)`;
+    return `✓ In Stock (${stockLevel} units)`;
+}
+
+async function updateFeaturedStock() {
+    try {
+        const response = await fetch(API_URL);
+        if (!response.ok) return;
+        
+        const products = await response.json();
+        
+        // Update featured products (IDs: 1, 2, 3, 7)
+        [1, 2, 3, 7].forEach(productId => {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                const stockElement = document.getElementById(`stock-${productId}`);
+                if (stockElement) {
+                    const threshold = product.low_stock_threshold || 10;
+                    stockElement.textContent = getStockText(product.stock_level, threshold);
+                    stockElement.className = `stock-info ${getStockClass(product.stock_level, threshold)}`;
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error updating stock:', error);
+    }
+}
+
+// Initial load
+updateFeaturedStock();
+
+// Update every 10 seconds (less frequent than products page)
+setInterval(updateFeaturedStock, 10000);
+</script>
+{% endblock %}
