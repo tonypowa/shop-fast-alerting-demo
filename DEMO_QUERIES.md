@@ -256,51 +256,6 @@ topk(10, sum by (filename) (count_over_time({service_name="shopfast-services"} |
 
 ---
 
-## 🔍 TRACE QUERIES (Tempo/TraceQL)
-
-### Basic Searches
-
-**Query 1: All traces from API service**
-```traceql
-{service.name="api-service"}
-```
-
-**Query 2: Slow traces (> 100ms)**
-```traceql
-{duration > 100ms}
-```
-
-**Query 3: Traces with errors**
-```traceql
-{status=error}
-```
-
-**Query 4: Specific span name**
-```traceql
-{name="POST /api/orders"}
-```
-
-**Query 5: Traces for specific product**
-```traceql
-{.product_id="1"}
-```
-
----
-
-### Advanced Queries
-
-**Query 6: Slow payment traces**
-```traceql
-{service.name="payment-service" && duration > 200ms}
-```
-
-**Query 7: Recent traces (last 5 minutes)**
-```traceql
-{} && intrinsic(startTime) > now() - 5m
-```
-
----
-
 ## 🎯 DEMO WALKTHROUGH QUERIES
 
 ### Flash Sale Scenario
@@ -327,12 +282,7 @@ sum(rate(http_requests_total[5m]))
 {service_name="shopfast-services", filename="/app/logs/api.log"} |= "Order" |= "created" |= "product 1"
 ```
 
-**5. Find order traces (Traces)**
-```traceql
-{service.name="api-service" && name=~"POST.*orders"}
-```
-
-**6. Check alert (Metrics)**
+**5. Check alert (Metrics)**
 ```promql
 inventory_stock_level{product_id="1"} <= 10
 ```
@@ -356,11 +306,6 @@ rate(payments_total{status="failed"}[5m])
 **3. Count errors over time (Logs)**
 ```logql
 sum(count_over_time({service_name="shopfast-services", filename="/app/logs/payment.log"} |= "ERROR" [1m]))
-```
-
-**4. Find failed payment traces (Traces)**
-```traceql
-{service.name="payment-service"}
 ```
 
 ---
@@ -406,7 +351,7 @@ WHERE stock_level <= low_stock_threshold
 2. **Use sum by (label)** - Group results by service, status, etc.
 3. **Time ranges matter** - [5m] for rate, [1m] for count_over_time
 4. **Filter early** - `{service_name="shopfast-services", filename="/app/logs/api.log"}` before `|=` filters
-5. **Correlate signals** - Use timestamps to jump between metrics/logs/traces
+5. **Correlate signals** - Use timestamps to jump between metrics and logs
 6. **Loki labels** - service_name="shopfast-services", filename="/app/logs/{service}.log"
 7. **String filtering** - Use `|= "ERROR"` or `|= "WARNING"` since level is not a label
 
@@ -418,12 +363,12 @@ WHERE stock_level <= low_stock_threshold
 |--------|-----------|---------------|
 | Metrics | Prometheus | `rate(http_requests_total[5m])` |
 | Logs | Loki | `{service_name="shopfast-services", filename="/app/logs/api.log"} \|= "ERROR"` |
-| Traces | Tempo | `{service.name="api-service"}` |
+| Database | PostgreSQL | `SELECT stock_level FROM products WHERE id = 1` |
 
 ---
 
 **For more information:**
 - Main README: `README.md`
-- Traces Guide: `TRACES.md`
+- Correlation Demo: `CORRELATION_DEMO.md`
 - Database Schema: `DATABASE_SCHEMA.md`
 
