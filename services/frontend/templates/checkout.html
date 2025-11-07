@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}ShopFast - Checkout{% endblock %}
+{% block nav_checkout %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Checkout</h1>
+
+    <div class="checkout-container">
+        <div class="checkout-steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-label">Cart Review</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-label">Payment</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-label">Confirmation</div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3>💡 Demo Environment</h3>
+            <p>This is a demo checkout page. Payment processing is simulated to demonstrate <strong>log-based alerting</strong> and <strong>distributed tracing</strong>.</p>
+        </div>
+
+        <h2 style="margin: 2rem 0 1rem 0;">Order Summary</h2>
+        <div class="checkout-summary">
+            <div class="summary-item">
+                <span>Gaming Laptop × 1</span>
+                <span>$1,299.99</span>
+            </div>
+            <div class="summary-item">
+                <span>Wireless Mouse × 2</span>
+                <span>$59.98</span>
+            </div>
+            <div class="summary-item">
+                <span>Subtotal</span>
+                <span>$1,359.97</span>
+            </div>
+            <div class="summary-item">
+                <span>Tax (10%)</span>
+                <span>$136.00</span>
+            </div>
+            <div class="summary-item">
+                <span>Shipping</span>
+                <span>Free</span>
+            </div>
+            <div class="summary-item">
+                <span>Total</span>
+                <span>$1,495.97</span>
+            </div>
+        </div>
+
+        <button class="btn">Proceed to Payment</button>
+
+        <div class="info-box" style="margin-top: 2rem;">
+            <h3>🔍 What Gets Monitored During Checkout?</h3>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <li><strong>Request Traces:</strong> Frontend → API → Payment → Database flow</li>
+                <li><strong>Payment Logs:</strong> Success/failure logs sent to Loki</li>
+                <li><strong>Response Times:</strong> Track slow payment processing</li>
+                <li><strong>Error Alerts:</strong> Trigger when payment failures exceed threshold</li>
+            </ul>
+        </div>
+
+        <div class="info-box" style="margin-top: 1rem; background: #fff3cd; border-left-color: #ffc107;">
+            <h3>⚠️ Try the Payment Failures Scenario</h3>
+            <p>Run <code>./run-simulation.sh</code> and select the <strong>Payment Failures</strong> option to trigger log-based alerts in Grafana!</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

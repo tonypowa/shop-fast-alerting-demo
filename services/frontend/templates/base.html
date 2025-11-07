@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ShopFast - Your Tech Store{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="/" class="logo">
+                    <span>⚡</span>
+                    <span>ShopFast</span>
+                    <span class="status-badge status-demo">DEMO</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="/" class="{% block nav_home %}{% endblock %}">Home</a></li>
+                    <li><a href="/products" class="{% block nav_products %}{% endblock %}">Products</a></li>
+                    <li><a href="/checkout" class="{% block nav_checkout %}{% endblock %}">Checkout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>About ShopFast</h4>
+                    <p>Grafana Alerting Demo Environment</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Services</h4>
+                    <p>API • Frontend • Payment • Inventory</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Observability</h4>
+                    <p>Metrics • Logs • Traces</p>
+                </div>
+            </div>
+            <p>&copy; 2024 ShopFast Demo | Powered by Grafana Observability Stack</p>
+        </div>
+    </footer>
+</body>
+</html>
+

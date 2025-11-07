@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}ShopFast - Products{% endblock %}
+{% block nav_products %}active{% endblock %}
+
+{% block content %}
+<style>
+.refresh-indicator {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: rgba(102, 126, 234, 0.9);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+    display: none;
+}
+
+.refresh-indicator.active {
+    display: block;
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.stock-updating {
+    transition: all 0.3s ease;
+}
+
+.last-updated {
+    font-size: 0.85rem;
+    color: #666;
+    text-align: center;
+    margin-top: 2rem;
+    font-style: italic;
+}
+
+.live-badge {
+    display: inline-block;
+    background: #28a745;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+</style>
+
+<div class="refresh-indicator" id="refreshIndicator">
+    🔄 Updating stock levels...
+</div>
+
+<div class="container">
+    <h1 class="page-title">Our Products <span class="live-badge">● LIVE</span></h1>
+    
+    <div class="info-box">
+        <h3>💡 Real-Time Stock Levels</h3>
+        <p>Stock levels update automatically every 5 seconds. Run the <strong>Flash Sale simulation</strong> to watch inventory deplete in real-time!</p>
+    </div>
+
+    <div class="product-grid" id="productGrid">
+        <!-- Products will be loaded via JavaScript -->
+        <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+            <p style="font-size: 1.2rem; color: #666;">Loading products...</p>
+        </div>
+    </div>
+
+    <p class="last-updated" id="lastUpdated">Loading...</p>
+
+    <div class="info-box" style="margin-top: 3rem;">
+        <h3>🔥 Try the Flash Sale Scenario</h3>
+        <p>Run <code>./run-simulation.sh</code> and select the Flash Sale option to watch inventory levels drop in real-time on this page!</p>
+    </div>
+</div>
+
+<script>
+const API_URL = 'http://localhost:8080/api/products';
+const REFRESH_INTERVAL = 5000; // 5 seconds
+
+// Product ID to emoji mapping
+const productEmojis = {
+    1: '💻', // Gaming Laptop
+    2: '🖱️', // Wireless Mouse
+    3: '⌨️', // Mechanical Keyboard
+    4: '🔌', // USB-C Hub
+    5: '💾', // External SSD
+    6: '📹', // Webcam
+    7: '🎧', // Headphones
+    8: '🖥️', // Monitor
+    9: '📱', // Phone Stand
+    10: '🔋'  // Power Bank
+};
+
+function getStockClass(stockLevel, threshold) {
+    // Use actual threshold from database with warning buffer
+    if (stockLevel <= 5) return 'stock-low';  // Critical: 5 or less
+    if (stockLevel <= threshold * 1.5) return 'stock-medium';  // Warning: within 50% above threshold
+    return 'stock-high';  // Good: well above threshold
+}
+
+function getStockText(stockLevel, threshold) {
+    if (stockLevel <= 5) return `⚠ Critical Stock (${stockLevel} units)`;
+    if (stockLevel <= threshold * 1.5) return `⚠ Low Stock (${stockLevel} units)`;
+    return `✓ In Stock (${stockLevel} units)`;
+}
+
+function createProductCard(product) {
+    const emoji = productEmojis[product.id] || '📦';
+    const threshold = product.low_stock_threshold || 10;
+    const stockClass = getStockClass(product.stock_level, threshold);
+    const stockText = getStockText(product.stock_level, threshold);
+    
+    return `
+        <div class="product-card">
+            <div class="product-image">${emoji}</div>
+            <div class="product-info">
+                <h3>${product.name}</h3>
+                <p>${product.description || ''}</p>
+                <p class="product-price">$${product.price.toFixed(2)}</p>
+                <div class="stock-info ${stockClass}" data-product-id="${product.id}">
+                    ${stockText}
+                </div>
+                <button class="btn">Add to Cart</button>
+            </div>
+        </div>
+    `;
+}
+
+async function fetchProducts() {
+    try {
+        const indicator = document.getElementById('refreshIndicator');
+        indicator.classList.add('active');
+        
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('Failed to fetch products');
+        
+        const products = await response.json();
+        const grid = document.getElementById('productGrid');
+        
+        // Update products
+        grid.innerHTML = products.map(createProductCard).join('');
+        
+        // Update timestamp
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        document.getElementById('lastUpdated').textContent = 
+            `Last updated: ${timeString}`;
+        
+        // Hide indicator after a delay
+        setTimeout(() => {
+            indicator.classList.remove('active');
+        }, 1000);
+        
+        console.log(`✓ Updated ${products.length} products at ${timeString}`);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        document.getElementById('lastUpdated').textContent = 
+            `Error loading products. Retrying...`;
+    }
+}
+
+// Initial load
+fetchProducts();
+
+// Auto-refresh every 5 seconds
+setInterval(fetchProducts, REFRESH_INTERVAL);
+
+console.log('📊 Real-time stock monitoring active. Updates every 5 seconds.');
+</script>
+{% endblock %}
