@@ -41,7 +41,7 @@ CREATE TABLE products (
 | 9 | Laptop Stand | 100 | 15 | 39.99 |
 | 10 | Phone Charger | 300 | 50 | 24.99 |
 
-#### Key Concepts for Your Talk
+#### Key concepts
 - **`stock_level`**: Current inventory (decreases with orders)
 - **`low_stock_threshold`**: When to trigger low inventory alert
 - **Alert fires when**: `stock_level <= low_stock_threshold`
@@ -167,7 +167,7 @@ CREATE TABLE login_attempts (
 );
 ```
 
-#### Key Concepts for Your Talk
+#### Key concepts
 - Used for **Security Alert**: "Multiple Failed Login Attempts"
 - Alert fires when: ≥5 failed attempts in 5 minutes for same email
 - Demonstrates **threat detection** and **security monitoring**
@@ -305,7 +305,7 @@ HAVING COUNT(*) >= 5
 
 ---
 
-## Talking Points for Your Presentation
+## Talking points
 
 ### 1. **Real Business Metrics**
 - Not just infrastructure monitoring (CPU, memory)
