@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 from prometheus_client import Counter, Histogram, generate_latest, REGISTRY
 import logging
 import time
@@ -73,7 +73,7 @@ def home():
     PAGE_VIEWS.labels(page='home').inc()
     logger.info('Home page accessed')
     
-    return jsonify({'page': 'home', 'status': 'ok'}), 200
+    return render_template('home.html'), 200
 
 @app.route('/products', methods=['GET'])
 def products():
@@ -87,7 +87,7 @@ def products():
     PAGE_VIEWS.labels(page='products').inc()
     logger.info('Products page accessed')
     
-    return jsonify({'page': 'products', 'status': 'ok'}), 200
+    return render_template('products.html'), 200
 
 @app.route('/checkout', methods=['GET'])
 def checkout():
@@ -109,7 +109,7 @@ def checkout():
     PAGE_VIEWS.labels(page='checkout').inc()
     logger.info('Checkout page accessed')
     
-    return jsonify({'page': 'checkout', 'status': 'ok'}), 200
+    return render_template('checkout.html'), 200
 
 @app.route('/simulate/high-cpu', methods=['POST'])
 def simulate_high_cpu():

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}ShopFast - Products{% endblock %}
+{% block nav_products %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Our Products</h1>
+    
+    <div class="info-box">
+        <h3>💡 Demo Tip</h3>
+        <p>Run the <strong>Flash Sale simulation</strong> to see inventory alerts trigger in real-time as stock depletes!</p>
+    </div>
+
+    <div class="product-grid">
+        <div class="product-card">
+            <div class="product-image">💻</div>
+            <div class="product-info">
+                <h3>Gaming Laptop</h3>
+                <p>High-performance gaming laptop</p>
+                <p class="product-price">$1,299.99</p>
+                <div class="stock-info stock-high">✓ In Stock (50 units)</div>
+                <button class="btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-image">🖱️</div>
+            <div class="product-info">
+                <h3>Wireless Mouse</h3>
+                <p>Ergonomic wireless mouse</p>
+                <p class="product-price">$29.99</p>
+                <div class="stock-info stock-high">✓ In Stock (150 units)</div>
+                <button class="btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-image">⌨️</div>
+            <div class="product-info">
+                <h3>Mechanical Keyboard</h3>
+                <p>RGB mechanical keyboard</p>
+                <p class="product-price">$89.99</p>
+                <div class="stock-info stock-medium">⚠ Low Stock (75 units)</div>
+                <button class="btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-image">🔌</div>
+            <div class="product-info">
+                <h3>USB-C Hub</h3>
+                <p>7-in-1 USB-C hub</p>
+                <p class="product-price">$49.99</p>
+                <div class="stock-info stock-high">✓ In Stock (200 units)</div>
+                <button class="btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-image">💾</div>
+            <div class="product-info">
+                <h3>External SSD 1TB</h3>
+                <p>Portable external SSD</p>
+                <p class="product-price">$119.99</p>
+                <div class="stock-info stock-medium">⚠ Low Stock (30 units)</div>
+                <button class="btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-image">📹</div>
+            <div class="product-info">
+                <h3>Webcam 4K</h3>
+                <p>4K webcam for streaming</p>
+                <p class="product-price">$149.99</p>
+                <div class="stock-info stock-low">⚠ Critical Stock (25 units)</div>
+                <button class="btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-image">🎧</div>
+            <div class="product-info">
+                <h3>Noise-Canceling Headphones</h3>
+                <p>Premium wireless headphones</p>
+                <p class="product-price">$299.99</p>
+                <div class="stock-info stock-high">✓ In Stock (40 units)</div>
+                <button class="btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-image">🖥️</div>
+            <div class="product-info">
+                <h3>Monitor 27"</h3>
+                <p>27-inch 4K monitor</p>
+                <p class="product-price">$399.99</p>
+                <div class="stock-info stock-low">⚠ Critical Stock (20 units)</div>
+                <button class="btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-image">📱</div>
+            <div class="product-info">
+                <h3>Phone Stand</h3>
+                <p>Adjustable phone stand</p>
+                <p class="product-price">$19.99</p>
+                <div class="stock-info stock-high">✓ In Stock (300 units)</div>
+                <button class="btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-image">🔋</div>
+            <div class="product-info">
+                <h3>Power Bank 20000mAh</h3>
+                <p>High-capacity power bank</p>
+                <p class="product-price">$59.99</p>
+                <div class="stock-info stock-high">✓ In Stock (100 units)</div>
+                <button class="btn">Add to Cart</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-box" style="margin-top: 3rem;">
+        <h3>🔥 Try the Flash Sale Scenario</h3>
+        <p>Run <code>./run-simulation.sh</code> and select the Flash Sale option to watch inventory levels drop and trigger alerts in Grafana!</p>
+    </div>
+</div>
+{% endblock %}
+

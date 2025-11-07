@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}ShopFast - Home{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <h1>Welcome to ShopFast! ⚡</h1>
+        <p>Your one-stop shop for tech gadgets — powered by Grafana Observability</p>
+    </div>
+</section>
+
+<div class="container">
+    <div class="info-box">
+        <h3>🎯 Grafana Alerting Demo Environment</h3>
+        <p>This is a fully instrumented e-commerce demo showcasing <strong>metrics (Prometheus)</strong>, <strong>logs (Loki)</strong>, and <strong>traces (Tempo)</strong> — all monitored with Grafana Alerting.</p>
+    </div>
+
+    <h2 class="page-title">Featured Products</h2>
+    
+    <div class="product-grid">
+        <div class="product-card">
+            <div class="product-image">💻</div>
+            <div class="product-info">
+                <h3>Gaming Laptop</h3>
+                <p class="product-price">$1,299.99</p>
+                <div class="stock-info stock-high">✓ In Stock (50 units)</div>
+                <a href="/products" class="btn">View Products</a>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-image">🖱️</div>
+            <div class="product-info">
+                <h3>Wireless Mouse</h3>
+                <p class="product-price">$49.99</p>
+                <div class="stock-info stock-high">✓ In Stock (150 units)</div>
+                <a href="/products" class="btn">View Products</a>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-image">⌨️</div>
+            <div class="product-info">
+                <h3>Mechanical Keyboard</h3>
+                <p class="product-price">$129.99</p>
+                <div class="stock-info stock-medium">⚠ Low Stock (75 units)</div>
+                <a href="/products" class="btn">View Products</a>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-image">🎧</div>
+            <div class="product-info">
+                <h3>Noise Cancelling Headphones</h3>
+                <p class="product-price">$199.99</p>
+                <div class="stock-info stock-high">✓ In Stock (100 units)</div>
+                <a href="/products" class="btn">View Products</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-box" style="margin-top: 3rem;">
+        <h3>📊 What's Being Monitored?</h3>
+        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+            <li><strong>Metrics:</strong> Page views, response times, CPU usage, error rates</li>
+            <li><strong>Logs:</strong> Access logs, error logs, payment failures</li>
+            <li><strong>Traces:</strong> Full request flow across all microservices</li>
+            <li><strong>Alerts:</strong> Low inventory, payment failures, high CPU, security events</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
