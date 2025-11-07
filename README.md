@@ -2,54 +2,7 @@
 
 Complete Grafana alerting demonstration with real-world e-commerce scenarios. Showcases **metrics** (Prometheus), **logs** (Loki), and **database queries** (PostgreSQL) with alerting 
 
-```
-╔════════════════════════════════════════════════════════════╗
-║        🚀 ShopFast Simulation Control Center 🚀           ║
-╚════════════════════════════════════════════════════════════╝
-
-Choose a simulation scenario to trigger Grafana alerts:
-
-💡 TIP: Press 'q' or '10' to exit | Option '1' to view stock levels
-
-1) 📊 View Current Stock Levels
-2) 🟢 Normal Traffic (baseline - no alerts)
-3) ⚡ Flash Sale (triggers LOW INVENTORY alert)
-4) 💳 Payment Failures (triggers LOG-BASED alert)
-5) 🔒 Security Breach (triggers DATABASE alert)
-6) 🔥 High CPU Usage (triggers METRICS alert)
-7) 📦 Low Inventory (gradual depletion)
-8) 🎯 Run ALL Scenarios (complete demo)
-9) 🔧 Rebuild Docker Image
-10) ❌ Exit
-
-Select scenario (1-10, or 'q' to quit): 3
-
-Available Products:
-  1. Gaming Laptop (Stock: 50)
-  2. Wireless Mouse (Stock: 150)
-  3. Mechanical Keyboard (Stock: 75)
-  ...
-
-Select Product ID [1-10, default: 1]: 1
-Duration in seconds [30]: 30
-
-🚀 Running simulation: flash-sale
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Starting Flash Sale Simulation...
-Duration: 30 seconds
-Product: Gaming Laptop (ID: 1)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Order #1: Gaming Laptop x2 ($2599.98) - Stock: 48 ✓
-Order #2: Gaming Laptop x1 ($1299.99) - Stock: 47 ✓
-Order #3: Gaming Laptop x3 ($3899.97) - Stock: 44 ✓
-...
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ Simulation completed!
-
-💡 TIP: Check Grafana → Alerting → Alert rules
-   Look for 'Low Inventory Warning' alert
-```
+<img width="1226" height="1866" alt="Screenshot from 2025-11-07 12-17-15" src="https://github.com/user-attachments/assets/2c46e7e7-4204-40d1-b482-254916a2f33d" />
 
 ---
 
