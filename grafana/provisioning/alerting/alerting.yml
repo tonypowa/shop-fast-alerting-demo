@@ -24,7 +24,7 @@ groups:
             datasourceUid: prometheus
             model:
               editorMode: code
-              expr: rate(process_cpu_seconds_total{job="frontend-service"}[1m])
+              expr: rate(process_cpu_seconds_total{job=~".*-service"}[1m])
               instant: true
               intervalMs: 1000
               legendFormat: __auto
