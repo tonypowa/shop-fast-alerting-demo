@@ -67,8 +67,6 @@ groups:
           severity: warning
           team: platform
         isPaused: false
-        notification_settings:
-          receiver: shopfast-general
 
       - uid: bf37htkezb37kd
         title: Low Inventory Warning
@@ -160,8 +158,6 @@ groups:
           severity: warning
           team: operations
         isPaused: false
-        notification_settings:
-          receiver: shopfast-inventory
 
       - uid: af37hvav7f30gf
         title: Critical Inventory Alert
@@ -254,8 +250,6 @@ groups:
           severity: critical
           team: operations
         isPaused: false
-        notification_settings:
-          receiver: shopfast-inventory
 
       - uid: df3q69crykzr4c
         title: Payment Service Failures
@@ -313,8 +307,6 @@ groups:
           severity: critical
           team: payments
         isPaused: false
-        notification_settings:
-          receiver: shopfast-payment
 
       - uid: ff3qaphxogyrkb
         title: Multiple Failed Login Attempts
@@ -407,8 +399,6 @@ groups:
           severity: critical
           team: security
         isPaused: false
-        notification_settings:
-          receiver: shopfast-general
 
       - uid: df3qc9jbq9jb4b
         title: High Error Rate
@@ -463,5 +453,3 @@ groups:
           severity: critical
           team: backend
         isPaused: false
-        notification_settings:
-          receiver: shopfast-general
