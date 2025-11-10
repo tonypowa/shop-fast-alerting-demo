@@ -61,8 +61,8 @@ groups:
         execErrState: Error
         for: 1m
         annotations:
-          description: CPU usage is above 70% for {{ $labels.job }} service
-          summary: High CPU usage detected
+          description: 'CPU usage is {{ $values.A.Value }} (threshold: 0.7) for service {{ $labels.job }} on instance {{ $labels.instance }}'
+          summary: 'High CPU detected: {{ $labels.job }} = {{ $values.A.Value }}'
         labels:
           severity: warning
           team: platform
