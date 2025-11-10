@@ -208,16 +208,22 @@ def scenario_payment_failures(duration_seconds=60):
     logger.info("Payment failures scenario completed")
 
 def scenario_high_cpu(duration_seconds=30):
-    """Scenario 4: High CPU usage"""
-    logger.info("Starting HIGH CPU scenario")
+    """Scenario 4: High CPU usage - runs multiple concurrent requests"""
+    logger.info("Starting HIGH CPU scenario with parallel load")
     
-    start_time = time.time()
-    while time.time() - start_time < duration_seconds:
+    def make_cpu_request():
         try:
-            requests.post(f"{FRONTEND_URL}/simulate/high-cpu", timeout=10)
+            requests.post(f"{FRONTEND_URL}/simulate/high-cpu", timeout=20)
         except Exception as e:
             logger.debug(f"CPU simulation error: {e}")
-        time.sleep(2)
+    
+    start_time = time.time()
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        while time.time() - start_time < duration_seconds:
+            # Fire 3 concurrent requests to really max out CPU
+            for _ in range(3):
+                executor.submit(make_cpu_request)
+            time.sleep(0.1)  # Very short sleep between batches
     
     logger.info("High CPU scenario completed")
 
