@@ -10,177 +10,458 @@ apiVersion: 1
 groups:
   - orgId: 1
     name: ShopFast Alerts
-    folder: ShopFast Demo
-    interval: 30s
+    folder: ShopFast Alerts
+    interval: 1m
     rules:
-      # High CPU Usage Alert
-      - uid: high_cpu_alert
-        title: High CPU Usage
-        condition: A
+      - uid: ef3q3kfu06jggf
+        title: 'High CPU Usage'
+        condition: B
         data:
           - refId: A
-            queryType: ''
             relativeTimeRange:
               from: 300
               to: 0
             datasourceUid: prometheus
             model:
-              expr: 'rate(process_cpu_seconds_total[1m]) > 0.7'
+              editorMode: code
+              expr: rate(process_cpu_seconds_total{job="frontend-service"}[1m])
+              instant: true
+              intervalMs: 1000
+              legendFormat: __auto
+              maxDataPoints: 43200
+              range: false
               refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0.7
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: []
+                  reducer:
+                    params: []
+                    type: avg
+                  type: query
+              datasource:
+                name: Expression
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: B
+              type: threshold
         noDataState: NoData
         execErrState: Error
         for: 1m
         annotations:
-          description: 'CPU usage is above 70% for {{ $labels.service }} service'
-          summary: 'High CPU usage detected'
+          description: CPU usage is above 70% for {{ $labels.job }} service
+          summary: High CPU usage detected
         labels:
           severity: warning
           team: platform
+        isPaused: false
+        notification_settings:
+          receiver: shopfast-general
 
-      # High Error Rate Alert
-      - uid: high_error_rate
-        title: High Error Rate
-        condition: A
+      - uid: bf37htkezb37kd
+        title: Low Inventory Warning
+        condition: C
         data:
           - refId: A
-            queryType: ''
             relativeTimeRange:
-              from: 300
+              from: 600
               to: 0
-            datasourceUid: prometheus
+            datasourceUid: postgres
             model:
-              expr: 'sum by (job) (rate(http_requests_total{status=~"4..|5.."}[5m])) > 0.1'
+              datasource:
+                type: grafana-postgresql-datasource
+                uid: postgres
+              editorMode: code
+              format: table
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              rawQuery: true
+              rawSql: SELECT COUNT(*) as value FROM products WHERE stock_level <= low_stock_threshold
               refId: A
+              sql:
+                columns:
+                  - parameters: []
+                    type: function
+                groupBy:
+                  - property:
+                      type: string
+                    type: groupBy
+                limit: 50
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
         noDataState: NoData
         execErrState: Error
-        for: 2m
+        for: 30s
         annotations:
-          description: 'Error rate is above 0.1 requests/sec for {{ $labels.job }}'
-          summary: 'High error rate detected'
-        labels:
-          severity: critical
-          team: backend
-
-      # Slow Response Time Alert
-      - uid: slow_response_time
-        title: Slow API Response Time
-        condition: A
-        data:
-          - refId: A
-            queryType: ''
-            relativeTimeRange:
-              from: 300
-              to: 0
-            datasourceUid: prometheus
-            model:
-              expr: 'histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1.0'
-              refId: A
-        noDataState: NoData
-        execErrState: Error
-        for: 3m
-        annotations:
-          description: '95th percentile response time is above 1 second for {{ $labels.service }}'
-          summary: 'Slow response time detected'
+          description: Products are running low on inventory
+          summary: Low inventory detected for multiple products
         labels:
           severity: warning
-          team: backend
+          team: operations
+        isPaused: false
+        notification_settings:
+          receiver: shopfast-inventory
 
-      # Payment Service Failures
-      - uid: payment_failures
-        title: Payment Service Failures
-        condition: A
+      - uid: af37hvav7f30gf
+        title: Critical Inventory Alert
+        condition: C
         data:
           - refId: A
-            queryType: ''
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: postgres
+            model:
+              datasource:
+                type: grafana-postgresql-datasource
+                uid: postgres
+              editorMode: code
+              format: table
+              hide: false
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              rawQuery: true
+              rawSql: SELECT COUNT(*) as value FROM products WHERE stock_level <= 5
+              refId: A
+              sql:
+                columns:
+                  - parameters: []
+                    type: function
+                groupBy:
+                  - property:
+                      type: string
+                    type: groupBy
+                limit: 50
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        noDataState: NoData
+        execErrState: Error
+        for: 30s
+        annotations:
+          description: Products have critically low inventory (5 or fewer units)
+          summary: 'CRITICAL: Inventory almost depleted'
+        labels:
+          severity: critical
+          team: operations
+        isPaused: false
+        notification_settings:
+          receiver: shopfast-inventory
+
+      - uid: df3q69crykzr4c
+        title: Payment Service Failures
+        condition: C
+        data:
+          - refId: A
+            queryType: instant
             relativeTimeRange:
               from: 600
               to: 0
             datasourceUid: loki
             model:
-              expr: 'sum(count_over_time({service_name="shopfast-services", filename="/app/logs/payment.log"} |= "ERROR" [5m])) > 5'
+              datasource:
+                type: loki
+                uid: loki
+              editorMode: code
+              expr: sum(count_over_time({service_name="shopfast-services", filename="/app/logs/payment.log"} |= "ERROR" [5m])) > 5
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              queryType: instant
               refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 5
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
         noDataState: NoData
         execErrState: Error
         for: 1m
         annotations:
-          description: 'Payment service has more than 5 failures in the last 5 minutes'
-          summary: 'Payment service experiencing failures'
+          description: Payment service has more than 5 failures in the last 5 minutes
+          summary: Payment service experiencing failures
         labels:
           severity: critical
           team: payments
+        isPaused: false
+        notification_settings:
+          receiver: shopfast-payment
 
-      # Low Inventory Alert
-      - uid: low_inventory
-        title: Low Inventory Warning
-        condition: A
-        data:
-          - refId: A
-            queryType: ''
-            relativeTimeRange:
-              from: 600
-              to: 0
-            datasourceUid: postgres
-            model:
-              rawSql: "SELECT name as metric, stock_level as value FROM products WHERE stock_level <= low_stock_threshold"
-              format: table
-              refId: A
-        noDataState: NoData
-        execErrState: Error
-        for: 30s
-        annotations:
-          description: 'Products are running low on inventory'
-          summary: 'Low inventory detected for multiple products'
-        labels:
-          severity: warning
-          team: operations
-
-      # Critical Inventory Alert
-      - uid: critical_inventory
-        title: Critical Inventory Alert
-        condition: A
-        data:
-          - refId: A
-            queryType: ''
-            relativeTimeRange:
-              from: 600
-              to: 0
-            datasourceUid: postgres
-            model:
-              rawSql: "SELECT name as metric, stock_level as value FROM products WHERE stock_level <= 5"
-              format: table
-              refId: A
-        noDataState: NoData
-        execErrState: Error
-        for: 30s
-        annotations:
-          description: 'Products have critically low inventory (5 or fewer units)'
-          summary: 'CRITICAL: Inventory almost depleted'
-        labels:
-          severity: critical
-          team: operations
-
-      # Failed Login Attempts (Security)
-      - uid: failed_login_attempts
+      - uid: ff3qaphxogyrkb
         title: Multiple Failed Login Attempts
-        condition: A
+        condition: C
         data:
           - refId: A
-            queryType: ''
             relativeTimeRange:
               from: 600
               to: 0
             datasourceUid: postgres
             model:
-              rawSql: "SELECT email as metric, COUNT(*) as value FROM login_attempts WHERE success = false AND attempt_time > NOW() - INTERVAL '5 minutes' GROUP BY email HAVING COUNT(*) >= 5"
+              datasource:
+                type: grafana-postgresql-datasource
+                uid: postgres
+              editorMode: code
               format: table
+              hide: false
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              rawQuery: true
+              rawSql: SELECT email as metric, COUNT(*) as value FROM login_attempts WHERE success = false AND attempt_time > NOW() - INTERVAL '5 minutes' GROUP BY email HAVING COUNT(*) >= 5
               refId: A
+              sql:
+                columns:
+                  - parameters: []
+                    type: function
+                groupBy:
+                  - property:
+                      type: string
+                    type: groupBy
+                limit: 50
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params: []
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - B
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              reducer: last
+              refId: B
+              type: reduce
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
         noDataState: NoData
         execErrState: Error
         for: 1m
         annotations:
-          description: 'Multiple failed login attempts detected for user account'
-          summary: 'Potential brute force attack detected'
+          description: Multiple failed login attempts detected for user account
+          summary: Potential brute force attack detected
         labels:
           severity: critical
           team: security
+        isPaused: false
+        notification_settings:
+          receiver: shopfast-general
 
+      - uid: df3qc9jbq9jb4b
+        title: High Error Rate
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: prometheus
+            model:
+              editorMode: code
+              expr: sum(rate(http_requests_total{status=~"4..|5.."}[5m]))
+              instant: true
+              intervalMs: 1000
+              legendFormat: __auto
+              maxDataPoints: 43200
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0.1
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - C
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+        noDataState: NoData
+        execErrState: Error
+        for: 2m
+        annotations:
+          description: Error rate is above 0.1 requests/sec for services
+          summary: High error rate detected
+        labels:
+          severity: critical
+          team: backend
+        isPaused: false
+        notification_settings:
+          receiver: shopfast-general
