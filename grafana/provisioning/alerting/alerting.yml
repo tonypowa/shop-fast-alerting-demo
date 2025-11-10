@@ -47,13 +47,13 @@ groups:
               to: 0
             datasourceUid: prometheus
             model:
-              expr: 'rate(http_requests_total{code=~"5.."}[5m]) > 0.1'
+              expr: 'sum by (job) (rate(http_requests_total{status=~"4..|5.."}[5m])) > 0.1'
               refId: A
         noDataState: NoData
         execErrState: Error
         for: 2m
         annotations:
-          description: 'Error rate is above 10% for {{ $labels.service }} service'
+          description: 'Error rate is above 0.1 requests/sec for {{ $labels.job }}'
           summary: 'High error rate detected'
         labels:
           severity: critical
