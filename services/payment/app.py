@@ -164,6 +164,20 @@ def simulate_failures():
     logger.warning(f'Payment failure rate changed to {FAILURE_RATE * 100}% for demo purposes')
     return jsonify({'status': 'updated', 'failure_rate': FAILURE_RATE}), 200
 
+@app.route('/api/payment/simulate-cpu', methods=['POST'])
+def simulate_high_cpu():
+    """Endpoint to simulate high CPU usage for demo purposes"""
+    logger.warning('Starting CPU intensive operation for demo')
+    start = time.time()
+    # Very CPU intensive operation - multiple operations to max out CPU
+    result = 0
+    for _ in range(5):
+        result += sum([i**2 * i**0.5 for i in range(5000000)])
+        result += sum([i**3 for i in range(3000000)])
+    duration = time.time() - start
+    logger.info(f'CPU intensive operation completed in {duration:.2f}s, result={result}')
+    return jsonify({'status': 'completed', 'duration': duration}), 200
+
 if __name__ == '__main__':
     logger.info('Starting Payment service on port 8082')
     app.run(host='0.0.0.0', port=8082)

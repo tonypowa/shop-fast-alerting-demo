@@ -252,6 +252,20 @@ def get_low_inventory():
         logger.error(f'Error retrieving low inventory: {str(e)}')
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/simulate-cpu', methods=['POST'])
+def simulate_high_cpu():
+    """Endpoint to simulate high CPU usage for demo purposes"""
+    logger.warning('Starting CPU intensive operation for demo')
+    start = time.time()
+    # Very CPU intensive operation - multiple operations to max out CPU
+    result = 0
+    for _ in range(5):
+        result += sum([i**2 * i**0.5 for i in range(5000000)])
+        result += sum([i**3 for i in range(3000000)])
+    duration = time.time() - start
+    logger.info(f'CPU intensive operation completed in {duration:.2f}s, result={result}')
+    return jsonify({'status': 'completed', 'duration': duration}), 200
+
 if __name__ == '__main__':
     logger.info('Starting API service on port 8080')
     app.run(host='0.0.0.0', port=8080)

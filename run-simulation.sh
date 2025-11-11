@@ -203,12 +203,29 @@ while true; do
                 ;;
             6)
                 echo ""
+                echo "Select target service:"
+                echo "  1. Frontend Service"
+                echo "  2. Payment Service"
+                echo "  3. Inventory Service"
+                echo "  4. API Service"
+                read -p "Service [1]: " service_choice
+                service_choice=${service_choice:-1}
+                
+                case $service_choice in
+                    1) service="frontend" ;;
+                    2) service="payment" ;;
+                    3) service="inventory" ;;
+                    4) service="api" ;;
+                    *) service="frontend" ;;
+                esac
+                
+                echo ""
                 read -p "Duration in seconds [30]: " duration
                 duration=${duration:-30}
-                run_simulation "high-cpu" --duration "$duration"
+                run_simulation "high-cpu" --duration "$duration" --service "$service"
                 echo ""
                 echo "💡 TIP: Check Grafana → Alerting → Alert rules"
-                echo "   Look for 'High CPU Usage' alert"
+                echo "   Look for 'High CPU Usage' alert firing for job=${service}-service"
                 break
                 ;;
             7)
@@ -271,9 +288,9 @@ while true; do
                 ;;
             9)
                 echo ""
-                echo "🔨 Rebuilding Docker image..."
+                echo "🔨 Rebuilding Docker image (no cache)..."
                 docker rmi $IMAGE_NAME 2>/dev/null || true
-                docker build -t $IMAGE_NAME "$SCRIPT_DIR/simulation"
+                docker build --no-cache -t $IMAGE_NAME "$SCRIPT_DIR/simulation"
                 echo "✅ Image rebuilt successfully!"
                 echo ""
                 break

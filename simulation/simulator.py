@@ -207,25 +207,46 @@ def scenario_payment_failures(duration_seconds=60):
     
     logger.info("Payment failures scenario completed")
 
-def scenario_high_cpu(duration_seconds=30):
-    """Scenario 4: High CPU usage - runs multiple concurrent requests"""
-    logger.info("Starting HIGH CPU scenario with parallel load")
+def scenario_high_cpu(duration_seconds=30, service='frontend'):
+    """Scenario 4: High CPU usage - runs multiple concurrent requests
+    
+    Args:
+        duration_seconds: How long to run the scenario
+        service: Which service to target (frontend, payment, inventory, api)
+    """
+    # Map service names to URLs and endpoints
+    service_urls = {
+        'frontend': f"{FRONTEND_URL}/simulate/high-cpu",
+        'payment': f"{PAYMENT_URL}/api/payment/simulate-cpu",
+        'inventory': f"{INVENTORY_URL}/api/inventory/simulate-cpu",
+        'api': f"{API_URL}/api/simulate-cpu"
+    }
+    
+    if service not in service_urls:
+        logger.error(f"Invalid service: {service}. Choose from: {list(service_urls.keys())}")
+        return
+    
+    target_url = service_urls[service]
+    logger.info(f"Starting HIGH CPU scenario on {service} service with parallel load")
     
     def make_cpu_request():
         try:
-            requests.post(f"{FRONTEND_URL}/simulate/high-cpu", timeout=20)
+            requests.post(target_url, timeout=20)
         except Exception as e:
             logger.debug(f"CPU simulation error: {e}")
     
     start_time = time.time()
-    with ThreadPoolExecutor(max_workers=3) as executor:
-        while time.time() - start_time < duration_seconds:
-            # Fire 3 concurrent requests to really max out CPU
-            for _ in range(3):
-                executor.submit(make_cpu_request)
-            time.sleep(0.1)  # Very short sleep between batches
+    try:
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            while time.time() - start_time < duration_seconds:
+                # Fire 3 concurrent requests to really max out CPU
+                for _ in range(3):
+                    executor.submit(make_cpu_request)
+                time.sleep(0.5)  # Short sleep between batches
+    except KeyboardInterrupt:
+        logger.info("CPU scenario interrupted by user")
     
-    logger.info("High CPU scenario completed")
+    logger.info(f"High CPU scenario completed for {service} service")
 
 def scenario_security_breach(email="admin@shopfast.com", attempts=10):
     """Scenario 5: Security - Multiple failed login attempts"""
@@ -271,6 +292,9 @@ def main():
     )
     parser.add_argument('--duration', type=int, default=60, help='Duration in seconds')
     parser.add_argument('--product-id', type=int, default=1, help='Product ID for targeted scenarios')
+    parser.add_argument('--service', type=str, default='frontend', 
+                        choices=['frontend', 'payment', 'inventory', 'api'],
+                        help='Target service for CPU scenario (default: frontend)')
     
     args = parser.parse_args()
     
@@ -284,7 +308,7 @@ def main():
         elif args.scenario == 'payment-failures':
             scenario_payment_failures(duration_seconds=args.duration)
         elif args.scenario == 'high-cpu':
-            scenario_high_cpu(duration_seconds=args.duration)
+            scenario_high_cpu(duration_seconds=args.duration, service=args.service)
         elif args.scenario == 'security':
             scenario_security_breach()
         elif args.scenario == 'low-inventory':
