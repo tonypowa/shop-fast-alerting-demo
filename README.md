@@ -16,7 +16,10 @@ docker compose up -d
 # 2. Open Grafana (wait 30 seconds first)
 # http://localhost:3000 (admin/admin)
 
-# 3. Run the interactive simulator
+# 3. Open Frontend App to see real-time inventory
+# http://localhost:8081
+
+# 4. Run the interactive simulator
 ./run-simulation.sh
 # Choose a scenario from the menu and watch alerts fire!
 ```
@@ -220,9 +223,9 @@ Perfect for presentations:
 docker compose up -d
 # Wait 60 seconds
 
-# 2. Show Grafana
-# Open http://localhost:3000
-# Navigate to: Alerting → Alert rules
+# 2. Open Grafana + Frontend
+# Grafana: http://localhost:3000 (Alerting → Alert rules)
+# Frontend: http://localhost:8081 (Watch real-time inventory)
 
 # 3. Run the interactive simulator
 ./run-simulation.sh
@@ -230,10 +233,9 @@ docker compose up -d
 # Product: 1 (Gaming Laptop)
 # Duration: 30 seconds
 
-# 4. Watch alerts fire in Grafana
-# The simulator generates organic traffic over 30 seconds
-# Alert fires after evaluation period (30-60s total)
-# Show: Low Inventory Warning alert
+# 4. Watch in real-time:
+# - Frontend: Stock levels dropping
+# - Grafana: Low Inventory warning alert fires
 
 # 5. Reset for next demo
 ./demo-control.sh
