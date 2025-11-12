@@ -286,18 +286,26 @@ Wait 60 seconds on first startup. PostgreSQL takes time to initialize.
 
 ---
 
-## Making Alerts Editable
+## Adding Notifications to Alerts
 
-Provisioned alerts are read-only by default. To make them editable:
+Provisioned alerts are read-only by default, but you can easily add notifications:
 
-```bash
-# After first startup
-docker compose stop grafana
-mv grafana/provisioning/alerting/alerting.yml grafana/provisioning/alerting/alerting.yml.backup
-docker compose start grafana
-```
+**Recommended: Configure Default Notification Policy**
 
-Now alerts are editable in the Grafana UI!
+The best way to add notifications is to configure contact points in the default notification policy - this will route all alerts automatically:
+
+1. Go to **Alerting** → **Notification policies**
+2. Click **Edit** on the default policy
+3. Add your contact point (Slack, email, PagerDuty, etc.)
+4. All alerts will now send notifications!
+
+**Alternative: Duplicate Alerts**
+
+If you need to modify specific alerts:
+1. Go to **Alerting** → **Alert rules**
+2. Find the alert you want to modify
+3. Click the **three dots** → **Duplicate**
+4. Edit the duplicated alert as needed
 
 ---
 
@@ -370,7 +378,7 @@ See [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) for complete schema documentation.
 
 ### Modify Alert Thresholds
 
-Edit `grafana/provisioning/alerting/alerting.yml` or modify in Grafana UI (after making alerts editable).
+Edit `grafana/provisioning/alerting/alerting.yml` directly, or duplicate alerts in the Grafana UI to create custom versions.
 
 ### Add Notification Channels
 
