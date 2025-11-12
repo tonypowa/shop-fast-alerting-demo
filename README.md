@@ -2,7 +2,8 @@
 
 Complete Grafana alerting demonstration with real-world e-commerce scenarios. Showcases **metrics** (Prometheus), **logs** (Loki), and **database queries** (PostgreSQL) with alerting 
 
-<img width="1226" height="1866" alt="Screenshot from 2025-11-07 12-17-15" src="https://github.com/user-attachments/assets/2c46e7e7-4204-40d1-b482-254916a2f33d" />
+<img width="1110" height="916" alt="image" src="https://github.com/user-attachments/assets/aec75924-a214-414f-9c86-1f5b31830788" />
+
 
 ---
 
