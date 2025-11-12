@@ -44,16 +44,15 @@ docker compose up -d
 - Payment Service (8082) - Payment processing
 - Inventory Service (8083) - Stock monitoring
 
-**7 Pre-Configured Alerts:**
+**6 Pre-Configured Alerts:**
 | Alert | Type | Trigger |
 |-------|------|---------|
 | High CPU Usage | Prometheus | CPU > 70% for 1 min |
-| High Error Rate | Prometheus | Errors > 10% for 2 min |
-| Slow Response Time | Prometheus | p95 > 1s for 3 min |
-| Payment Failures | Loki | > 5 errors in 5 min |
-| Low Inventory | PostgreSQL | Stock ≤ threshold |
-| Critical Inventory | PostgreSQL | Stock ≤ 5 units |
-| Failed Logins | PostgreSQL | ≥ 5 attempts in 5 min |
+| High Error Rate | Prometheus | > 0.1 req/sec for 2 min |
+| Payment Service Failures | Loki | > 5 errors in 5 min |
+| Low Inventory Warning | PostgreSQL | Stock ≤ threshold for 30s |
+| Critical Inventory Alert | PostgreSQL | Stock ≤ 5 units for 30s |
+| Multiple Failed Login Attempts | PostgreSQL | ≥ 5 attempts in 5 min |
 
 ![Alt text](images/alert-rules-baseline.jpg "Provided  alerts to monitor fastshop")
 ---
@@ -288,7 +287,7 @@ Wait 60 seconds on first startup. PostgreSQL takes time to initialize.
 
 ## Adding Notifications to Alerts
 
-Provisioned alerts are read-only by default, but you can easily add notifications:
+Provisioned alerts are read-only by default, but you can add notifications:
 
 **Recommended: Configure Default Notification Policy**
 
