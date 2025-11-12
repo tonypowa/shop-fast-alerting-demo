@@ -34,7 +34,7 @@ docker compose up -d
 - Loki - Log storage
 - PostgreSQL - Business database
 
-> 🚀 **Why Alloy?** This demo showcases Grafana Alloy as a **unified collector** for metrics and logs. Instead of multiple agents (Promtail for logs, separate Prometheus exporters), Alloy does it all! It collects metrics and logs from your services and routes them to the appropriate backends (Prometheus, Loki). This simplifies your architecture, reduces resource usage, and provides better visibility into your telemetry pipeline via the built-in UI.
+> 🚀 **Why Alloy?** This demo showcases Grafana Alloy as a **unified collector** for metrics and logs. Instead of multiple agents, Alloy does it all! It collects metrics and logs from your services and routes them to the appropriate backends (Prometheus, Loki). This simplifies your architecture, reduces resource usage, and provides better visibility into your telemetry pipeline via the built-in UI.
 
 > 🔍 **Multi-Source Alerting:** This demo showcases alerting from **three different data sources**: metrics (Prometheus), logs (Loki), and database queries (PostgreSQL) - all unified in Grafana
 
@@ -411,10 +411,6 @@ docker compose down -v
 # Remove simulator image
 docker rmi shopfast-simulator
 ```
-
-### Migration Note
-
-If you previously used this demo with Promtail, the old `loki/promtail-config.yml` file is no longer needed. The new Alloy configuration is in `alloy/config.alloy` using the modern River syntax.
 
 ---
 

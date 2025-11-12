@@ -4,10 +4,7 @@ This directory contains the Grafana Alloy configuration for the ShopFast demo.
 
 ## What is Alloy?
 
-Grafana Alloy is the modern, unified observability collector that replaces several older agents:
-- **Promtail** (logs)
-- **Grafana Agent** (metrics, logs, traces)
-- **Agent Operator** (Kubernetes deployments)
+Grafana Alloy is the modern, unified observability collector for metrics, logs, and traces.
 
 ## Configuration File
 
@@ -104,5 +101,4 @@ Access the Alloy UI at **http://localhost:12345** to:
 
 - [Alloy Documentation](https://grafana.com/docs/alloy/latest/)
 - [River Language Reference](https://grafana.com/docs/alloy/latest/concepts/configuration-syntax/)
-- [Migration from Promtail](https://grafana.com/docs/alloy/latest/tasks/migrate/from-promtail/)
 
