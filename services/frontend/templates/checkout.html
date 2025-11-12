@@ -25,7 +25,7 @@
 
         <div class="info-box">
             <h3>💡 Demo Environment</h3>
-            <p>This is a demo checkout page. Payment processing is simulated to demonstrate <strong>log-based alerting</strong> and <strong>distributed tracing</strong>.</p>
+            <p>This is a demo checkout page. Payment processing is simulated to demonstrate <strong>log-based alerting</strong>.</p>
         </div>
 
         <h2 style="margin: 2rem 0 1rem 0;">Order Summary</h2>
@@ -61,7 +61,6 @@
         <div class="info-box" style="margin-top: 2rem;">
             <h3>🔍 What Gets Monitored During Checkout?</h3>
             <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                <li><strong>Request Traces:</strong> Frontend → API → Payment → Database flow</li>
                 <li><strong>Payment Logs:</strong> Success/failure logs sent to Loki</li>
                 <li><strong>Response Times:</strong> Track slow payment processing</li>
                 <li><strong>Error Alerts:</strong> Trigger when payment failures exceed threshold</li>

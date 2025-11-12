@@ -35,7 +35,7 @@ docker compose up -d
 
 > 🚀 **Why Alloy?** This demo showcases Grafana Alloy as a **unified collector** for metrics and logs. Instead of multiple agents (Promtail for logs, separate Prometheus exporters), Alloy does it all! It collects metrics and logs from your services and routes them to the appropriate backends (Prometheus, Loki). This simplifies your architecture, reduces resource usage, and provides better visibility into your telemetry pipeline via the built-in UI.
 
-> 🔍 **Complete Alerting:** This demo showcases **multi-source alerting**: metrics (Prometheus), logs (Loki), and database queries (PostgreSQL) - all monitored in Grafana for alerting
+> 🔍 **Multi-Source Alerting:** This demo showcases alerting from **three different data sources**: metrics (Prometheus), logs (Loki), and database queries (PostgreSQL) - all unified in Grafana
 
 **Microservices:**
 - API Service (8080) - Product catalog and orders
@@ -144,40 +144,49 @@ Options:
 ## Architecture
 
 ```
-┌─────────────┐
-│   Grafana   │ ← Port 3000
-└──────┬──────┘
+                    ┌─────────────┐
+                    │   Grafana   │ ← Port 3000 (Dashboards & Alerting)
+                    └──────┬──────┘
+                           │ (queries)
+         ┌─────────────────┼─────────────────┐
+         │                 │                 │
+    ┌────▼─────┐      ┌────▼────┐      ┌────▼─────┐
+    │Prometheus│      │  Loki   │      │ Postgres │
+    │  :9090   │      │  :3100  │      │  :5432   │
+    │ (Metrics)│      │ (Logs)  │      │   (DB)   │
+    └────▲─────┘      └────▲────┘      └────▲─────┘
+         │                 │                 │
+         │ (remote_write)  │ (forward)       │ (SQL queries)
+         │                 │                 │
+         └────────┬────────┘                 │
+                  │                          │
+            ┌─────▼─────┐                    │
+            │   Alloy   │                    │
+            │  :12345   │                    │
+            │(Collector)│                    │
+            └─────▲─────┘                    │
+                  │                          │
+         (scrape /metrics + tail logs)       │
+                  │                          │
+       ┌──────────┴──────────────────────────┘
        │
-       ├────────────┬──────────┬──────────┬──────────┐
-       │            │          │          │          │
-┌──────▼─────┐ ┌───▼────┐ ┌──▼────┐ ┌───▼────┐ ┌──▼─────┐
-│ Prometheus │ │  Loki  │ │ Tempo │ │Postgres│ │ Alloy  │
-│   :9090    │ │ :3100  │ │ :3200 │ │ :5432  │ │ :12345 │
-└──────┬─────┘ └────▲───┘ └───▲───┘ └───┬────┘ └────┬───┘
-       │            │         │          │           │
-       │      ┌─────┴─────────┴──────────┘           │
-       │      │   Logs & Traces Collector            │
-       │      │   (Ports 4317/4318 OTLP)             │
-       │      │                                       │
-       └──────┴───────────────────────────────────────┴───┐
-                                                           │
-       ┌───────────────────────────────────────────────────▼─┐
-       │          Microservices (OTel Instrumented)          │
-       │  API│Frontend│Payment│Inventory                     │
-       │  8080  8081    8082   8083                          │
-       └─────────────────────────────────────────────────────┘
+┌──────▼───────────────────────────────────┐
+│         Microservices                    │
+│  API  │ Frontend │ Payment │ Inventory   │
+│  8080 │   8081   │  8082   │   8083      │
+└──────────────────────────────────────────┘
 ```
 
-**Data Flow (Unified via Alloy):**
-- **Metrics**: Alloy scrapes services → forwards to Prometheus via remote write
-- **Logs**: Services write to files → Alloy reads → forwards to Loki
-- **Traces**: Services send OTLP to Alloy → Alloy forwards to Tempo
+**Data Flow:**
+- **Metrics**: Services expose `/metrics` → Alloy scrapes → Prometheus (via remote_write) → Grafana queries
+- **Logs**: Services write to log files → Alloy tails → Loki → Grafana queries
+- **Database**: Grafana queries PostgreSQL directly for business metrics
 
-**Why This is Better:**
-- ✅ Single collector agent (Alloy) for all telemetry
+**Benefits:**
+- ✅ Single collector agent (Alloy) for metrics and logs
 - ✅ Reduced resource footprint vs. multiple agents
 - ✅ Centralized configuration and debugging via Alloy UI
-- ✅ Better visibility into the collection pipeline
+- ✅ Multi-source alerting: Prometheus, Loki, and PostgreSQL
 
 ---
 
