@@ -26,6 +26,9 @@ docker compose up -d
 
 **That's it!** No Python installation needed - everything runs in Docker.
 
+<img width="1096" height="792" alt="image" src="https://github.com/user-attachments/assets/79eaa011-62a8-47ba-8790-37f8866bc06e" />
+
+
 ---
 
 ## What's Included
