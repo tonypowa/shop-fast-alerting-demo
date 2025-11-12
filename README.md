@@ -352,29 +352,6 @@ rate(process_cpu_seconds_total[1m]) > 0.7
 docker exec -it shopfast-postgres psql -U shopfast -d shopfast
 ```
 
-### Useful Queries
-
-```sql
--- View current inventory
-SELECT name, stock_level, low_stock_threshold 
-FROM products 
-ORDER BY stock_level ASC;
-
--- View recent orders
-SELECT o.id, p.name, o.quantity, o.total_amount, o.order_time
-FROM orders o
-JOIN products p ON o.product_id = p.id
-ORDER BY o.order_time DESC
-LIMIT 10;
-
--- Check failed login attempts
-SELECT email, COUNT(*) as attempts
-FROM login_attempts 
-WHERE success = false 
-  AND attempt_time > NOW() - INTERVAL '5 minutes'
-GROUP BY email;
-```
-
 See [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) for complete schema documentation.
 
 ---
@@ -454,11 +431,13 @@ Or use WSL/Git Bash for `.sh` scripts.
 1. **Services start** via `docker-compose.yml`
 2. **Grafana auto-provisions** data sources and alert rules
 3. **Simulator generates traffic** via Dockerized Python script
-4. **Services emit observability data:**
-   - **Metrics** → Prometheus (scraped via /metrics endpoint)
-   - **Logs** → Log files → Alloy → Loki
-5. **Alloy acts as collector** for logs
-6. **Grafana evaluates** alert rules every 30 seconds
+4. **Services expose observability data:**
+   - Metrics via `/metrics` endpoints
+   - Logs written to `/app/logs/` files
+5. **Alloy collects everything** (unified collector):
+   - Scrapes metrics from services → forwards to Prometheus
+   - Tails log files → forwards to Loki
+6. **Grafana evaluates** alert rules against all data sources
 7. **Alerts fire** when conditions are met
 
 ---
