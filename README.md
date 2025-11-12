@@ -29,7 +29,7 @@ docker compose up -d
 
 **Observability Stack:**
 - Grafana 12 - Dashboards and alerting
-- **Alloy - Unified observability collector** ⭐ (metrics and logs)
+- Alloy - Unified observability collector (metrics and logs)
 - Prometheus - Metrics storage
 - Loki - Log storage
 - PostgreSQL - Business database
