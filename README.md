@@ -54,7 +54,8 @@ docker compose up -d
 | Critical Inventory Alert | PostgreSQL | Stock ≤ 5 units for 30s |
 | Multiple Failed Login Attempts | PostgreSQL | ≥ 5 attempts in 5 min |
 
-![Alt text](images/alert-rules-baseline.jpg "Provided  alerts to monitor fastshop")
+<img width="1470" height="423" alt="image" src="https://github.com/user-attachments/assets/f57a8938-5274-4342-a6b6-9abd9731cb2b" />
+
 ---
 
 ## Requirements
