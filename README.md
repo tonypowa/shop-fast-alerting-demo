@@ -461,16 +461,13 @@ Or use WSL/Git Bash for `.sh` scripts.
 - Quick reset between presentations
 - Reliable, reproducible results
 
-See [TALK_NOTES.md](TALK_NOTES.md) for a complete presentation guide.
-
 ---
 
 ## Additional Documentation
 
 - **[DATABASE_SCHEMA.md](DATABASE_SCHEMA.md)** - Complete database schema and queries
-- **[CORRELATION_DEMO.md](CORRELATION_DEMO.md)** - Guide for demonstrating metrics & logs
-- **[TALK_NOTES.md](TALK_NOTES.md)** - Presentation script with timing and Q&A prep
 
+---
 
 ## Support
 

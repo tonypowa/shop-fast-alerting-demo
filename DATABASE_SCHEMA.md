@@ -305,46 +305,6 @@ HAVING COUNT(*) >= 5
 
 ---
 
-## Talking points
-
-### 1. **Real Business Metrics**
-- Not just infrastructure monitoring (CPU, memory)
-- Alerting on **inventory levels** - direct business impact
-- Alerting on **security threats** - protect customer data
-- Alerting on **revenue** - failed payments cost money
-
-### 2. **Multiple Data Types**
-- **Time-series metrics** (Prometheus): CPU, request rates
-- **Log data** (Loki): Error patterns, events
-- **Structured business data** (PostgreSQL): Inventory, security
-
-### 3. **Alert Sophistication**
-- **Simple thresholds**: CPU > 70%
-- **Aggregations**: Count failed logins per user
-- **Business logic**: Stock level vs. threshold per product
-- **Time windows**: Events in last 5 minutes
-
-### 4. **Demo Flow**
-```
-Normal Operations
-    ↓
-Flash Sale Starts (simulate traffic spike)
-    ↓
-Inventory Depletes Rapidly
-    ↓
-Alert: Low Inventory Warning (Warning)
-    ↓
-Stock Continues to Drop
-    ↓
-Alert: Critical Inventory (Critical)
-    ↓
-Operations Team Notified
-    ↓
-Restock Triggered
-```
-
----
-
 ## Quick Reference Commands
 
 ### Explore Database in Grafana
@@ -387,25 +347,4 @@ orders ←→ products (updates stock_level)
     
 login_attempts → monitors security for customers
 ```
-
----
-
-## For Your Demo
-
-**Best Products to Demonstrate:**
-- **Product #1 (Gaming Laptop)**: High value item, good for flash sale demo
-- **Product #6 (Webcam 4K)**: Low threshold (5), triggers critical alert quickly
-- **Product #8 (Monitor 27")**: Lowest stock (20), easier to deplete
-
-**Simulation Recommendations:**
-1. Start with normal baseline
-2. Run flash sale on Product #1
-3. Watch inventory drop
-4. Alert fires when stock ≤ 10
-5. Show alert in Grafana UI
-6. Show actual data in database
-
----
-
-Good luck with your presentation! 🎉
 

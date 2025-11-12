@@ -59,20 +59,9 @@ Runs all scenarios in sequence:
 python simulator.py all
 ```
 
-## Demo Flow Suggestion
+## Monitoring
 
-For a talk, you can demonstrate alerts in this order:
-
-1. Start with normal traffic (background)
-2. Show the Grafana dashboard with all services healthy
-3. Run flash-sale scenario → Low inventory alert fires
-4. Run payment-failures scenario → Payment alert fires
-5. Run security scenario → Security alert fires
-6. Run high-cpu scenario → CPU alert fires
-
-## Monitoring During Demo
-
-While scenarios run, you can monitor:
+You can monitor the services at:
 - Prometheus: http://localhost:9090
 - Loki: http://localhost:3100
 - Grafana: http://localhost:3000 (admin/admin)
